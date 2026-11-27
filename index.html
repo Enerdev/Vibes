@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Vibes · Muévete por Puno</title>
   <meta name="description" content="Rutas de combis, paraderos, lanchas del lago y reportes en tiempo real en Puno." />
-  <meta name="theme-color" content="#0b1020" />
+  <meta name="theme-color" content="#0b7a4b" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="img/icon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="img/icon.svg" />
@@ -15,6 +15,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   <link rel="stylesheet" href="css/app.css" />
+  <link rel="stylesheet" href="css/tema.css" />
 </head>
 <body>
   <div id="map" aria-label="Mapa de Puno"></div>
@@ -70,6 +71,31 @@
     <div class="panel-body">
       <!-- EXPLORAR -->
       <section class="view on" data-view="explorar">
+        <div class="hero">
+          <h2>Encuentra tu ruta</h2>
+          <div class="ir-card">
+            <div class="filas">
+              <button class="fila" id="hero-ir"><span class="ico">🔍</span>Llévame a algún lugar</button>
+              <button class="fila" id="hero-casa"><span class="ico">🏠</span>Llévame a casa</button>
+            </div>
+            <button class="swap" id="hero-ubicar" title="Usar mi ubicación">⇅</button>
+          </div>
+          <div class="pills">
+            <button class="naranja" id="hero-reportar">🔥 Reportes en vivo</button>
+            <button class="verde" id="hero-registrar">⭐ Graba una ruta</button>
+          </div>
+          <h3>¿Cómo te mueves?</h3>
+          <div class="modos" id="modos">
+            <button class="modo" data-modo="rutas"><span class="circ">🚌</span><span>Combi</span></button>
+            <button class="modo" data-modo="mototaxi"><span class="circ">🛺</span><span>Mototaxi</span></button>
+            <button class="modo" data-modo="taxi"><span class="circ">🚕</span><span>Taxi</span></button>
+            <button class="modo" data-modo="lago"><span class="circ">⛴️</span><span>Lancha</span></button>
+            <button class="modo" data-modo="paraderos"><span class="circ">🚏</span><span>Paraderos</span></button>
+            <button class="modo" data-modo="envivo"><span class="circ">📡</span><span>En vivo</span></button>
+            <button class="modo" data-modo="region"><span class="circ">🏔️</span><span>Región</span></button>
+            <button class="modo" data-modo="osm"><span class="circ">🗺️</span><span>Datos OSM</span></button>
+          </div>
+        </div>
         <div class="demo-note">Datos de demostración · rutas y tarifas por validar en campo</div>
         <h3>Rutas de combi <button id="btn-guardar-ruta" class="mini-guardar" title="Guardar la línea seleccionada">⭐ Guardar ruta</button></h3>
         <div id="lista-rutas" class="lista"></div>

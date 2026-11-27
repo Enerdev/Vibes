@@ -44,11 +44,11 @@ const TILES = {
   claro: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
   satelite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 };
-const ORDEN_TEMAS = ['oscuro', 'satelite', 'claro'];
+const ORDEN_TEMAS = ['claro', 'satelite', 'oscuro'];
 const zoomNativo = (t) => (t === 'oscuro' ? 16 : t === 'satelite' ? 18 : 19);
 const ATRIB = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Tiles &copy; Esri';
 let tema = 'oscuro';
-try { tema = localStorage.getItem('vibes:tema') || 'oscuro'; } catch { /* */ }
+try { tema = localStorage.getItem('vibes:tema') || 'claro'; } catch { /* */ }
 if (!TILES[tema]) tema = 'oscuro';
 const base = L.tileLayer(TILES[tema], { attribution: ATRIB, maxZoom: 19, maxNativeZoom: zoomNativo(tema) }).addTo(map);
 document.body.classList.toggle('claro', tema === 'claro');
@@ -893,6 +893,7 @@ function aplicarFiltros() {
       $(`#capas [data-capa="${c}"]`)?.classList.toggle('on', !!f[id]);
     }
   }
+  if (typeof sincronizarModos === 'function') sincronizarModos();
 }
 
 function renderCuenta() {
@@ -981,6 +982,27 @@ $('#lista-comunidad').addEventListener('click', (e) => {
   toast(cuentas.guardarRuta(r.id, r.nombre) ? '⭐ Ruta guardada' : 'Esa ruta ya está guardada');
 }, true);
 
+// ---------------- Inicio visual: modos de transporte y accesos rápidos ----------------
+// Los círculos de "¿Cómo te mueves?" encienden/apagan la misma capa que su chip.
+function sincronizarModos() {
+  $$('#modos [data-modo]').forEach((b) => b.classList.toggle('on', map.hasLayer(capas[b.dataset.modo])));
+}
+$$('#modos [data-modo]').forEach((b) => {
+  b.onclick = () => { $(`#capas [data-capa="${b.dataset.modo}"]`)?.click(); sincronizarModos(); };
+});
+$$('#capas .chip').forEach((c) => c.addEventListener('click', sincronizarModos));
+$('#hero-ir').onclick = () => { abrirTab('ir'); $('#destino').focus(); };
+$('#hero-casa').onclick = () => {
+  const casa = cuentas.actual?.lugares[0];
+  if (!casa) { toast('Inicia sesión (👤) y guarda tu casa como primer lugar ⭐'); return; }
+  fijar('destino', { pos: casa.pos, nombre: casa.nombre });
+  abrirTab('ir');
+  asegurarOrigen();
+};
+$('#hero-ubicar').onclick = () => ubicarme().catch(() => {});
+$('#hero-reportar').onclick = () => abrirTab('reportes');
+$('#hero-registrar').onclick = () => abrirTab('registrar');
+
 // ---------------- Inicio ----------------
 function iniciar() {
   st.rutas = cargarRed((rutas) => {
@@ -1005,6 +1027,7 @@ function iniciar() {
   dibujarOSM(osmLocal());
   aplicarFiltros();
   renderCuenta();
+  sincronizarModos();
   osmActualizar().then((l) => { if (l) dibujarOSM(l); });
   encuadrar(L.latLngBounds(st.rutas.flatMap((r) => r.trazo)), 15);
   setInterval(() => { renderCercanos(); dibujarReportes(); }, 20000);

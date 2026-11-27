@@ -74,6 +74,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: `js/usuario.js` con cuentas por dispositivo (PIN guardado con hash SHA-256 y sal, nunca en texto plano), lugares y rutas favoritas, y filtros por usuario (transporte público, distrital/interprovincial, mototaxi, taxi, lanchas) que se aplican al iniciar sesión. Probado: crear cuenta, PIN incorrecto rechazado, filtros y favoritos persistentes. Fase 2: sincronizar las cuentas con un backend.
 
+12. **Prompt 12:** (con dos imágenes de referencia de apps de mapas) "que la interfaz sea asi, asi de bonita ... siguiendo el diseño que ves en las referencias ... basate en esos colores"
+
+   Resultado: `css/tema.css` con tema claro (verde bosque #0b7a4b, naranja #ff6a13 y lavanda), mapa claro por defecto, bloque "Encuentra tu ruta" con tarjeta "Llévame a algún lugar / Llévame a casa", botones píldora y una cuadrícula de círculos "¿Cómo te mueves?" (combi, mototaxi, taxi, lancha, paraderos, en vivo, región, OSM) que activan cada capa del mapa.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo
