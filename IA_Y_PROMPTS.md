@@ -78,6 +78,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: `css/tema.css` con tema claro (verde bosque #0b7a4b, naranja #ff6a13 y lavanda), mapa claro por defecto, bloque "Encuentra tu ruta" con tarjeta "Llévame a algún lugar / Llévame a casa", botones píldora y una cuadrícula de círculos "¿Cómo te mueves?" (combi, mototaxi, taxi, lancha, paraderos, en vivo, región, OSM) que activan cada capa del mapa.
 
+13. **Prompt 13:** "que tipo de arquitectura usaste para ello" + las preguntas de sustentación de la rúbrica.
+
+   Resultado: `docs/SUSTENTACION.md` con las respuestas: problema, arquitectura (PWA cliente en capas con ES Modules y APIs) y su justificación, tecnologías, uso de IA, funcionalidades, limitaciones y plan para producción.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo
