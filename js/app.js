@@ -1,7 +1,7 @@
 // ============================================================
 //  Vibes · Muévete por Puno — aplicación principal
 // ============================================================
-import { CIUDAD, LUGARES, PARADEROS_EXTRA, LAGO, INTERPROVINCIAL, TIPOS_REPORTE } from '../data/puno.js';
+import { CIUDAD, LUGARES, PARADEROS_EXTRA, LAGO, INTERPROVINCIAL, TIPOS_REPORTE, TARIFAS } from '../data/puno.js';
 import { distancia, longitud, formatoDistancia, formatoMinutos } from './geo.js';
 import { cargarRed, paraderos as calcularParaderos, lugarPorId } from './red.js';
 import { Flota } from './envivo.js';
@@ -9,6 +9,7 @@ import { planificar } from './planificador.js';
 import { Reportes, hace } from './reportes.js';
 import { estadoLago, proximaSalida } from './lago.js';
 import { Grabadora, RutasComunidad, TIPOS as TIPOS_REG, CONFIRMACIONES_VALIDADA } from './registro.js';
+import { rutaOptima, lineaDeComunidad } from './grafo.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -358,6 +359,30 @@ $('#chk-estudiante').onchange = () => calcular();
 
 const ICONO_MODO = { pie: '🚶', combi: '🚌', taxi: '🚕', mototaxi: '🛺' };
 
+/**
+ * Grafo multimodal (js/grafo.js): une líneas base y rutas grabadas por la comunidad,
+ * con pesos que cambian según los reportes activos. Si encuentra un camino distinto
+ * a las opciones clásicas, lo agrega; si coincide, marca esa opción como óptima.
+ */
+function agregarOpcionGrafo() {
+  const lineas = [...st.rutas, ...comunidad.lista.filter((r) => r.tipo !== 'lancha').map(lineaDeComunidad)];
+  const g = rutaOptima({
+    origen: st.origen.pos, destino: st.destino.pos, lineas, flota: st.flota,
+    reportes: st.reportes.activos(),
+    pasaje: $('#chk-estudiante').checked ? TARIFAS.combiEstudiante : TARIFAS.combiUrbana,
+  });
+  if (!g) return;
+  const firma = (o) => (o.lineas || []).map((l) => l.id).join('+');
+  const igual = st.opciones.find((o) => o.lineas && firma(o) === firma(g));
+  if (igual) {
+    igual.etiqueta = (igual.etiqueta ? igual.etiqueta + ' · ' : '') + 'Óptima (grafo)';
+    return;
+  }
+  g.etiqueta = 'Óptima (grafo)';
+  st.opciones.push(g);
+  st.opciones.sort((a, b) => a.minutos - b.minutos);
+}
+
 function calcular() {
   capaPlan.clearLayers();
   const res = $('#resultados');
@@ -371,6 +396,7 @@ function calcular() {
     origen: st.origen.pos, destino: st.destino.pos, rutas: st.rutas, flota: st.flota,
     estudiante: $('#chk-estudiante').checked,
   });
+  agregarOpcionGrafo();
   if (!st.opciones.length) {
     res.innerHTML = '<p class="muted">Están muy cerca: ¡puedes ir caminando!</p>';
     return;
