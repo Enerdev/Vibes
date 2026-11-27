@@ -55,7 +55,7 @@ HTML5, CSS3, JavaScript (ES Modules) · Leaflet 1.9.4 · OpenStreetMap y Esri (m
 1. **Backend y base de datos:** API REST (Node/Express o PHP en Plesk) + PostgreSQL/**PostGIS** o Supabase; cuentas con autenticación real (JWT, hash bcrypt), sincronización de rutas y reportes.
 2. **Moderación y calidad de datos:** consenso de varias grabaciones (clustering de trayectorias), reputación del usuario, panel de validación.
 3. **Tiempo real:** WebSockets para reportes; GPS en unidades (convenio con empresas) para el "en vivo" real; predicción de llegadas con historial.
-4. **Calidad:** pruebas unitarias (geo, grafo, registro) y E2E (Playwright), CI en GitHub Actions, linter.
+4. **Calidad:** ya hay 7 pruebas unitarias (`npm test`); faltan pruebas E2E (Playwright), CI en GitHub Actions y linter.
 5. **Seguridad y legal:** HTTPS, política de privacidad y consentimiento de ubicación (Ley 29733 de datos personales), límites de uso de APIs.
 6. **Operación:** monitoreo de errores, respaldos, CDN, servidor propio de tiles/ruteo si crece el uso.
 7. **Alianzas:** Municipalidad de Puno, SUTRAN y la Capitanía del lago para datos oficiales; publicar el dataset como datos abiertos.

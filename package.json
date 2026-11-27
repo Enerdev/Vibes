@@ -1,0 +1,6 @@
+{
+  "name": "vibes-puno",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test tests/nucleo.test.js" }
+}

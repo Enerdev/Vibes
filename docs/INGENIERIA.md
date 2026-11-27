@@ -78,6 +78,7 @@ Provincia(id, nombre, capital, pos, km, transporte) · Distrito(nombre, pos)
 5. **Difusión:** mapa, "¿Cómo llego?" y exportación GeoJSON como dato abierto.
 
 ## 8. Pruebas realizadas
+- **Pruebas unitarias automatizadas** (`npm test`, 7 casos, 7 aprobados): Haversine, Douglas–Peucker (línea recta y esquina), similitud de trazos, Dijkstra con transbordo, pesos dinámicos por reportes y caso sin ruta. Archivo: `tests/nucleo.test.js`.
 - `node --check` en todos los módulos.
 - En navegador: grabar ruta en modo demo (4 puntos, 1 paradero → 790 m); grabar la misma ruta otra vez suma confirmación (✓ 2) sin duplicar.
 - Grafo: Plaza de Armas → Jayllihuaya = L4 + L2 (41 min, 30 nodos, 81 aristas); con reportes en L2 cambia a L4 → L1 → L2.

@@ -82,6 +82,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: `docs/SUSTENTACION.md` con las respuestas: problema, arquitectura (PWA cliente en capas con ES Modules y APIs) y su justificación, tecnologías, uso de IA, funcionalidades, limitaciones y plan para producción.
 
+14. **Prompt 14:** "tenemos 15 minutos, aun pero el software tiene que cumplir con esas caracteristicas"
+
+   Resultado: pruebas unitarias automatizadas con el runner nativo de Node (`npm test`): 7 casos sobre Haversine, Douglas–Peucker, similitud de trazos y el grafo con Dijkstra (transbordo, pesos dinámicos y caso sin ruta). 7/7 aprobados.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo
