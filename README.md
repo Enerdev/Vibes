@@ -67,6 +67,18 @@ Edita `data/puno.js`:
 3. Si cambias el recorrido de una ruta existente, borra el caché del navegador
    (`localStorage` → `vibes:trazos:v1`) para que se vuelva a trazar.
 
+## Base de datos (MySQL en Plesk)
+
+Sin base de datos la app funciona en **modo local** (todo en el celular). Con ella, rutas, reportes y cuentas se comparten entre todos.
+
+1. Plesk → **Bases de datos → Añadir base de datos** (nombre `vibes`, crea un usuario con contraseña).
+2. Abre **phpMyAdmin** de esa base y ejecuta `database/schema.sql` (pestaña SQL o Importar).
+3. En el Administrador de archivos, copia `api/config.example.php` como `api/config.php` y pon el host, base, usuario y clave.
+4. Abre `https://TU-DOMINIO/api/index.php?r=salud`: debe responder `{"ok":true,"db":true}`.
+5. En la app, el panel "Explorar" muestra **☁️ Base de datos conectada**.
+
+En local (XAMPP): `mysql -u root < database/schema.sql`, crea `api/config.php` y sirve con `php -S 127.0.0.1:8000`.
+
 ## Documentación
 
 - [docs/INGENIERIA.md](docs/INGENIERIA.md): requerimientos, arquitectura, algoritmos, modelo de datos y pruebas.

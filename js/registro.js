@@ -76,18 +76,30 @@ export class RutasComunidad {
     if (igual) {
       igual.confirmaciones += 1;
       guardar(this.lista);
+      this.alCambiar?.('confirmar', igual);
       return { ruta: igual, nueva: false };
     }
     const r = { ...ruta, id: 'c' + Date.now().toString(36), confirmaciones: 1, creado: Date.now() };
     this.lista.push(r);
     guardar(this.lista);
+    this.alCambiar?.('nueva', r);
     return { ruta: r, nueva: true };
   }
 
   confirmar(id) {
     const r = this.lista.find((x) => x.id === id);
-    if (r) { r.confirmaciones += 1; guardar(this.lista); }
+    if (r) { r.confirmaciones += 1; guardar(this.lista); this.alCambiar?.('confirmar', r); }
     return r;
+  }
+
+  /** Une las rutas del servidor con las locales (el servidor manda en las confirmaciones). */
+  fusionar(remotas) {
+    for (const rr of remotas) {
+      const local = this.lista.find((x) => x.id === rr.id);
+      if (local) local.confirmaciones = Math.max(local.confirmaciones, rr.confirmaciones);
+      else this.lista.push(rr);
+    }
+    guardar(this.lista);
   }
 
   borrar(id) {

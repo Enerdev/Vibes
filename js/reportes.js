@@ -43,6 +43,7 @@ export class Reportes {
     const r = { id: `r-${Date.now()}`, tipo, pos, texto: texto?.trim() || '', creado: Date.now(), sigue: 0, yaNo: 0 };
     this.lista.push(r);
     guardar(this.lista);
+    this.alCambiar?.('nuevo', r);
     return r;
   }
 
@@ -50,6 +51,18 @@ export class Reportes {
     const r = this.lista.find((x) => x.id === id);
     if (!r) return;
     r[campo] += 1;
+    guardar(this.lista);
+    this.alCambiar?.('voto', r, campo);
+    this.limpiar();
+  }
+
+  /** Une los reportes del servidor con los locales. */
+  fusionar(remotos) {
+    for (const rr of remotos) {
+      const local = this.lista.find((x) => x.id === rr.id);
+      if (local) { local.sigue = Math.max(local.sigue, rr.sigue); local.yaNo = Math.max(local.yaNo, rr.yaNo); }
+      else this.lista.push(rr);
+    }
     guardar(this.lista);
     this.limpiar();
   }

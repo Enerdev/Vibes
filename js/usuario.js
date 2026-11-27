@@ -5,6 +5,8 @@
 //  Fase 2: mover estas cuentas a un backend (Supabase / PHP en Plesk) para
 //  sincronizar entre celulares.
 // ============================================================
+import { API } from './api.js';
+
 const KEY = 'vibes:usuarios:v1';
 const KEY_SESION = 'vibes:sesion:v1';
 
@@ -41,10 +43,25 @@ export class Cuentas {
     this.actual = s && this.usuarios[s] ? this.usuarios[s] : null;
   }
 
+  /** Con base de datos: la cuenta vive en el servidor (PIN con bcrypt) y aquí solo una copia sin PIN. */
+  async viaServidor(recurso, nombre, pin) {
+    const datos = { lugares: [], rutas: [], filtros: { ...FILTROS_INICIALES } };
+    const r = await API.pedir(recurso, { metodo: 'POST', datos: { nombre, pin, datos } });
+    API.token = r.token;
+    const k = clave(r.nombre);
+    this.usuarios[k] = {
+      nombre: r.nombre, servidor: true, creado: Date.now(),
+      lugares: r.datos?.lugares || [], rutas: r.datos?.rutas || [], filtros: { ...FILTROS_INICIALES, ...(r.datos?.filtros || {}) },
+    };
+    guardar(this.usuarios);
+    return this.iniciar(k);
+  }
+
   async registrar(nombre, pin) {
     const k = clave(nombre);
     if (k.length < 3) throw new Error('El nombre debe tener al menos 3 letras');
     if (!/^\d{4,6}$/.test(pin)) throw new Error('El PIN debe tener de 4 a 6 números');
+    if (API.disponible) return this.viaServidor('registro', nombre, pin);
     if (this.usuarios[k]) throw new Error('Ese usuario ya existe en este celular');
     const sal = crypto.getRandomValues(new Uint32Array(2)).join('-');
     this.usuarios[k] = {
@@ -56,6 +73,7 @@ export class Cuentas {
   }
 
   async entrar(nombre, pin) {
+    if (API.disponible) return this.viaServidor('login', nombre, pin);
     const u = this.usuarios[clave(nombre)];
     if (!u || u.pin !== await hash(u.sal + pin)) throw new Error('Usuario o PIN incorrecto');
     return this.iniciar(clave(nombre));
@@ -68,11 +86,16 @@ export class Cuentas {
   }
 
   salir() {
+    if (this.actual?.servidor) { API.enviar('salir', {}); API.token = null; }
     this.actual = null;
     try { localStorage.removeItem(KEY_SESION); } catch { /* */ }
   }
 
-  persistir() { guardar(this.usuarios); }
+  persistir() {
+    guardar(this.usuarios);
+    const u = this.actual;
+    if (u?.servidor) API.enviar('perfil', { datos: { lugares: u.lugares, rutas: u.rutas, filtros: u.filtros } });
+  }
 
   /** Filtros del usuario, o los iniciales si no hay sesión. */
   get filtros() { return this.actual?.filtros || { ...FILTROS_INICIALES }; }

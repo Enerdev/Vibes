@@ -41,7 +41,7 @@ En la región Puno casi no hay datos abiertos de transporte: combis, mototaxis y
 ```
 Presentación   index.html · css/app.css · js/app.js (pestañas, mapa, eventos)
 Lógica         planificador.js · grafo.js · registro.js · envivo.js · reportes.js · lago.js
-Datos          data/puno.js · data/osm-puno.js · data/region.js · localStorage
+Datos          data/puno.js · data/osm-puno.js · data/region.js · localStorage · MySQL (api/index.php)
 Servicios      Geolocation API · Leaflet · OSM/Esri tiles · OSRM · Overpass · Open-Meteo
 ```
 - **Patrón módulo (ES Modules):** cada archivo exporta solo su interfaz pública.
@@ -73,7 +73,7 @@ Provincia(id, nombre, capital, pos, km, transporte) · Distrito(nombre, pos)
 ## 7. Ciclo del dato (sistema de información)
 1. **Captura:** el pasajero graba con GPS (o importa un GeoJSON).
 2. **Validación:** filtro de precisión y simplificación; deduplicación por similitud.
-3. **Almacenamiento:** `localStorage` (fase 2: base de datos compartida, p. ej. Supabase).
+3. **Almacenamiento:** `localStorage` en el celular y **MySQL** en el servidor (`api/index.php`, `database/schema.sql`); sincroniza cada 30 s.
 4. **Procesamiento:** grafo + Dijkstra para planificar.
 5. **Difusión:** mapa, "¿Cómo llego?" y exportación GeoJSON como dato abierto.
 
@@ -86,5 +86,5 @@ Provincia(id, nombre, capital, pos, km, transporte) · Distrito(nombre, pos)
 
 ## 9. Limitaciones y fase 2
 - Los datos de rutas son de demostración y las coordenadas de la región son referenciales.
-- Las rutas grabadas viven en cada celular: falta un backend compartido.
+- La base de datos MySQL ya comparte rutas, reportes y cuentas; falta moderación y consenso de aportes.
 - Predicción de llegada con historial de grabaciones; quechua y aymara completos; panel para la municipalidad.

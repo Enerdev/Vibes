@@ -13,6 +13,7 @@ import { rutaOptima, lineaDeComunidad } from './grafo.js';
 import { osmLocal, osmActualizar, ESTILO_OSM } from './osm.js';
 import { PROVINCIAS, DISTRITOS_PUNO, REGION_LIMITES } from '../data/region.js';
 import { Cuentas, FILTROS } from './usuario.js';
+import { API } from './api.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -1003,6 +1004,41 @@ $('#hero-ubicar').onclick = () => ubicarme().catch(() => {});
 $('#hero-reportar').onclick = () => abrirTab('reportes');
 $('#hero-registrar').onclick = () => abrirTab('registrar');
 
+// ---------------- Base de datos compartida (api/index.php → MySQL) ----------------
+// Primero se guarda en el celular (funciona sin señal) y luego se envía al servidor.
+// Cada 30 s se traen las rutas y reportes de los demás usuarios.
+comunidad.alCambiar = (accion, r) => {
+  if (accion === 'nueva') API.enviar('rutas', { id: r.id, nombre: r.nombre, tipo: r.tipo, tarifa: r.tarifa, velocidad: r.velocidad, trazo: r.trazo, paradas: r.paradas });
+  else API.enviar('confirmar', { id: r.id });
+};
+st.reportes.alCambiar = (accion, r, campo) => {
+  if (accion === 'nuevo') API.enviar('reportes', { id: r.id, tipo: r.tipo, pos: r.pos, texto: r.texto });
+  else if (!r.demo) API.enviar('votar', { id: r.id, voto: campo });
+};
+
+async function sincronizar() {
+  if (!API.disponible) return;
+  try {
+    const [rs, rp] = await Promise.all([API.pedir('rutas'), API.pedir('reportes')]);
+    const remotas = new Set(rs.rutas.map((r) => r.id));
+    // Rutas grabadas sin conexión que el servidor aún no tiene: se suben ahora.
+    comunidad.lista.filter((r) => !remotas.has(r.id)).forEach((r) => comunidad.alCambiar('nueva', r));
+    comunidad.fusionar(rs.rutas);
+    st.reportes.fusionar(rp.reportes);
+    dibujarComunidad();
+    renderComunidad();
+    dibujarReportes();
+  } catch (e) {
+    console.warn('Sincronización', e.message);
+  }
+}
+
+function marcarConexion() {
+  const el = $('#estado-bd');
+  el.textContent = API.disponible ? '☁️ Base de datos conectada: tus rutas y reportes se comparten' : '📱 Modo local: los datos se guardan solo en este celular';
+  el.classList.toggle('ok', API.disponible);
+}
+
 // ---------------- Inicio ----------------
 function iniciar() {
   st.rutas = cargarRed((rutas) => {
@@ -1025,6 +1061,7 @@ function iniciar() {
   dibujarComunidad();
   renderComunidad();
   dibujarOSM(osmLocal());
+  API.iniciar().then(() => { marcarConexion(); sincronizar(); setInterval(sincronizar, 30000); });
   aplicarFiltros();
   renderCuenta();
   sincronizarModos();

@@ -26,6 +26,7 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 - Mapas con Leaflet y OpenStreetMap, mapa de calor (leaflet.heat) y análisis de cobertura (zonas a más de 500 m de un paradero).
 - Consumo de API pública (Open-Meteo) para el estado del viento en el lago Titicaca.
 - Exportación e importación en GeoJSON (formato de datos abiertos).
+- **Base de datos relacional:** MySQL/MariaDB con API REST en PHP (PDO, bcrypt, tokens).
 - **Teoría de grafos:** red multimodal y algoritmo de Dijkstra con pesos dinámicos.
 - **Datos abiertos:** API Overpass de OpenStreetMap (paraderos, terminales y muelles reales).
 - Segmentación territorial de la región Puno (provincias y distritos).
@@ -89,6 +90,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 15. **Prompt 15:** "generame un informe con un lean canvas, que sea un modelo de negocio, genera un informe tecnico, y tambien todo lo necesario en ingenieria de software y sistemas de la informacion"
 
    Resultado: `docs/INFORME.md` con resumen ejecutivo, Lean Canvas de 9 bloques, modelo de negocio con fuentes de ingreso y hoja de ruta, informe técnico (arquitectura, tecnologías, algoritmos, pruebas), ingeniería de software (actores, RF, RNF, caso de uso), sistemas de información (ciclo del dato, modelo de datos, seguridad) y plan a producción. Subido después de las 4:00 pm a pedido del equipo.
+
+16. **Prompt 16:** con los requisitos del reto (autenticación, uso de IA, Git, VS Code, npm, despliegue, base de datos y preguntas de sustentación): "eso mas tienes que contemplar para nuestro informe. y si eso faltaba mejorar algo me avisas"
+
+   Resultado: el informe suma la sección "Cumplimiento de los requisitos del reto". La IA avisó que faltaba **una base de datos** y, con la aprobación del equipo, la agregó: `database/schema.sql` (tablas `usuarios`, `rutas`, `reportes`), `api/index.php` (API REST en PHP 8 con PDO, consultas preparadas, PIN con bcrypt y token Bearer) y `js/api.js` (sincronización cada 30 s con respaldo local sin conexión). Probado en local con XAMPP: registro, login con PIN incorrecto rechazado, rutas, confirmaciones, reportes, votos y perfil guardados en MySQL; sin PHP la app sigue en modo local. Subido después de las 4:00 pm a pedido del equipo.
 
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 

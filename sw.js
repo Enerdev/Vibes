@@ -1,8 +1,8 @@
 // Service worker: la app abre aunque no haya señal (modo offline básico).
-const VERSION = 'vibes-v9';
+const VERSION = 'vibes-v10';
 const APP = [
   './', 'index.html', 'css/app.css', 'css/tema.css', 'manifest.webmanifest', 'img/icon.svg',
-  'js/app.js', 'js/geo.js', 'js/red.js', 'js/envivo.js', 'js/planificador.js', 'js/reportes.js', 'js/lago.js', 'js/registro.js', 'js/grafo.js', 'js/osm.js', 'js/usuario.js',
+  'js/app.js', 'js/geo.js', 'js/red.js', 'js/envivo.js', 'js/planificador.js', 'js/reportes.js', 'js/lago.js', 'js/registro.js', 'js/grafo.js', 'js/osm.js', 'js/usuario.js', 'js/api.js',
   'data/puno.js', 'data/osm-puno.js', 'data/region.js',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
@@ -34,8 +34,8 @@ self.addEventListener('fetch', (e) => {
     return;
   }
 
-  // Clima y rutas por calles: siempre de la red
-  if (url.hostname.includes('open-meteo') || url.hostname.includes('osrm')) return;
+  // Clima, rutas por calles y nuestra API (base de datos): siempre de la red, nunca de caché
+  if (url.hostname.includes('open-meteo') || url.hostname.includes('osrm') || url.pathname.includes('/api/')) return;
 
   // Archivos de la app: red primero, caché si no hay conexión
   e.respondWith(

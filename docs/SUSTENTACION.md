@@ -44,15 +44,15 @@ HTML5, CSS3, JavaScript (ES Modules) · Leaflet 1.9.4 · OpenStreetMap y Esri (m
 | PWA | Instalable y funciona sin señal |
 
 ## 6. Limitaciones
-- **Sin backend:** rutas grabadas, reportes y cuentas viven en cada celular; no se comparten entre usuarios.
+- **Backend mínimo:** API PHP + MySQL que comparte rutas, reportes y cuentas; falta moderación, tiempo real (WebSockets) y escalar.
 - **Datos de demostración:** rutas, tarifas, horarios y coordenadas de la región son aproximados; falta levantarlos en campo.
 - El "en vivo" de las combis es **simulado** (no hay GPS en las unidades).
-- El login es local: no hay recuperación de contraseña ni sincronización.
+- El login usa PIN con bcrypt y token; falta recuperación de cuenta.
 - Quechua y aymara solo parcialmente; sin voz todavía.
 - La API Overpass es lenta (hasta 35 s), por eso se usa una copia local.
 
 ## 7. ¿Qué harían para llevarlo a producción?
-1. **Backend y base de datos:** API REST (Node/Express o PHP en Plesk) + PostgreSQL/**PostGIS** o Supabase; cuentas con autenticación real (JWT, hash bcrypt), sincronización de rutas y reportes.
+1. **Base de datos:** ya hay API PHP + MySQL (`api/index.php`, `database/schema.sql`). Para escalar: PostGIS para consultas espaciales, índices geográficos y tokens con expiración.
 2. **Moderación y calidad de datos:** consenso de varias grabaciones (clustering de trayectorias), reputación del usuario, panel de validación.
 3. **Tiempo real:** WebSockets para reportes; GPS en unidades (convenio con empresas) para el "en vivo" real; predicción de llegadas con historial.
 4. **Calidad:** ya hay 7 pruebas unitarias (`npm test`); faltan pruebas E2E (Playwright), CI en GitHub Actions y linter.

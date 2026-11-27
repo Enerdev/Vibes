@@ -98,7 +98,8 @@ La capa de lógica concentra el valor técnico: el grafo y el registro GPS. Si u
 | Ruteo por calles | OSRM | Ajustar las líneas de combi a las calles reales |
 | Datos abiertos | Overpass API (OpenStreetMap) | 52 paraderos, terminales y muelles reales |
 | Clima | Open-Meteo | Viento y ráfagas del lago Titicaca |
-| Seguridad | Web Crypto (SHA-256 con sal) | PIN de las cuentas, nunca en texto plano |
+| Base de datos | MySQL / MariaDB + API PHP 8 (PDO) | Rutas, reportes y cuentas compartidos entre usuarios |
+| Seguridad | bcrypt en servidor, SHA-256 en modo local | PIN de las cuentas, nunca en texto plano |
 | Offline | Service Worker + Web App Manifest | App instalable que abre sin señal |
 | Formato abierto | GeoJSON | Exportar e importar rutas |
 | Pruebas | Node.js test runner | 7 pruebas unitarias del núcleo |
@@ -181,7 +182,7 @@ Vibes es un **sistema de información geográfica (SIG) colaborativo**: captura 
 
 1. **Captura:** el pasajero graba con GPS, reporta un incidente o importa un GeoJSON; Overpass y Open-Meteo aportan datos externos.
 2. **Validación:** filtro de precisión GPS, simplificación del trazo y deduplicación por similitud; confirmaciones de la comunidad.
-3. **Almacenamiento:** `localStorage` por dispositivo y por usuario (fase 2: base de datos espacial PostGIS).
+3. **Almacenamiento:** `localStorage` en el celular (funciona sin señal) y **MySQL** en el servidor, sincronizados cada 30 s.
 4. **Procesamiento:** grafo y Dijkstra para planificar; caducidad de reportes a las 6 horas.
 5. **Difusión:** mapa, "¿Cómo llego?", cinta EN VIVO y exportación GeoJSON como dato abierto.
 
@@ -191,21 +192,21 @@ Vibes es un **sistema de información geográfica (SIG) colaborativo**: captura 
 | --- | --- | --- |
 | Línea | id, nombre, color, frecuencia, horario, paradas | `data/puno.js` |
 | Paradero | id, nombre, posición (lat, lng) | `data/puno.js`, `data/osm-puno.js` |
-| RutaComunidad | id, nombre, tipo, tarifa, velocidad, trazo, paradas, confirmaciones, fecha | `localStorage` |
-| Reporte | id, tipo, posición, texto, fecha, votos | `localStorage` |
-| Usuario | nombre, sal, hash del PIN, lugares, rutas, filtros | `localStorage` |
+| RutaComunidad | id, nombre, tipo, tarifa, velocidad, trazo, paradas, confirmaciones, fecha | MySQL `rutas` + `localStorage` |
+| Reporte | id, tipo, posición, texto, fecha, votos | MySQL `reportes` + `localStorage` |
+| Usuario | nombre, hash bcrypt del PIN, token, lugares, rutas, filtros | MySQL `usuarios` |
 | Provincia / Distrito | nombre, capital, posición, distancia, transporte | `data/region.js` |
 
 **Seguridad y privacidad.** La ubicación no se envía a ningún servidor propio. El PIN se guarda como hash SHA-256 con sal aleatoria. El sitio debe servirse con HTTPS, requisito del navegador para el GPS y el modo offline. Para producción se aplicará la Ley 29733 de Protección de Datos Personales con consentimiento explícito de ubicación.
 
 ## Limitaciones, riesgos y plan a producción
 
-La limitación principal es que no hay backend: rutas, reportes y cuentas viven en cada celular. Llevarlo a producción empieza por una base de datos compartida.
+Ya existe una base de datos MySQL con API PHP que comparte rutas, reportes y cuentas. Llevarlo a producción requiere moderación de aportes, datos de campo y tiempo real.
 
 | Limitación o riesgo | Impacto | Acción para producción |
 | --- | --- | --- |
-| Sin backend compartido | Las rutas grabadas no se ven en otros celulares | API REST (Node o PHP en Plesk) con PostgreSQL + PostGIS o Supabase |
-| Login solo local | No hay recuperación de cuenta ni sincronización | Autenticación real con JWT y hash bcrypt en servidor |
+| Backend mínimo | Sin consultas espaciales ni tiempo real | PostGIS para consultas geográficas y WebSockets para reportes |
+| Login con PIN | Sin recuperación de cuenta; el token no expira | Expiración de tokens y recuperación por correo |
 | Datos de demostración | Rutas, tarifas y coordenadas aproximadas | Levantamiento en campo y convenio con la municipalidad |
 | "En vivo" simulado | Las llegadas de combis son estimadas | GPS en unidades por convenio con empresas; predicción con historial |
 | Calidad de aportes | Rutas erróneas o malintencionadas | Consenso de varias grabaciones, reputación de usuarios, moderación |

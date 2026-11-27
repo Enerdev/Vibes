@@ -82,3 +82,7 @@ h3 { color: var(--text); font-size: 15px; text-transform: none; letter-spacing: 
 .modo:hover .circ { transform: translateY(-2px); }
 .modo.on .circ { box-shadow: 0 0 0 3px var(--verde), inset 0 -8px 0 rgba(11, 122, 75, .15); }
 .modo.on span:last-child { color: var(--verde); font-weight: 700; }
+
+/* Estado de la base de datos */
+.estado-bd { margin-top: 8px; padding: 8px 12px; border-radius: 10px; font-size: 12px; background: var(--card); color: var(--muted); }
+.estado-bd.ok { background: #e9f5ee; color: var(--verde); font-weight: 600; }
