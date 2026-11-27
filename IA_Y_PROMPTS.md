@@ -26,6 +26,9 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 - Mapas con Leaflet y OpenStreetMap, mapa de calor (leaflet.heat) y análisis de cobertura (zonas a más de 500 m de un paradero).
 - Consumo de API pública (Open-Meteo) para el estado del viento en el lago Titicaca.
 - Exportación e importación en GeoJSON (formato de datos abiertos).
+- **Teoría de grafos:** red multimodal y algoritmo de Dijkstra con pesos dinámicos.
+- **Datos abiertos:** API Overpass de OpenStreetMap (paraderos, terminales y muelles reales).
+- Segmentación territorial de la región Puno (provincias y distritos).
 
 **Skills de Claude usados en la sesión**
 - Ninguno especializado: el código se generó con las herramientas generales de escritura de archivos.
@@ -45,6 +48,16 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
    > "Lee CONTEXTO_CLAUDE_CODE.md y continúa desde el paso 1 de la sección 5. https://github.com/Enerdev/Vibes ese es el repo de mi compañero, ahi debemos ver todos sus cambios y tambien codear todo con las especificaciones del concurso"
 
    Resultado: se revisó el MVP subido por el compañero (mapa, ¿Cómo llego?, en vivo, lago, reportes, PWA). Se agregó este archivo obligatorio y se integró la **función estrella**: pestaña *Registrar* para grabar rutas y paraderos de combis, mototaxis y lanchas con el GPS del celular (con modo demo tocando el mapa), validación comunitaria y exportación GeoJSON. Se probó en el navegador antes de cada commit.
+
+5. **Prompt 5:** "podemos usar grafos tambien para el dinamismo de las ubicaciones, usa datasets si ya existen tambien"
+
+   Resultado: `js/grafo.js` modela la red como un **grafo** (nodos = paraderos de líneas base y de la comunidad; aristas de viaje, transbordo y acceso) y busca la ruta óptima con **Dijkstra** y montículo binario. Los pesos son dinámicos: cada reporte activo cerca de un tramo suma 10 min y la espera usa la flota en vivo, así la ruta cambia sola (probado: con reportes en L2 el camino pasa de L4→L2 a L4→L1→L2). Dataset: se extrajeron con la API **Overpass de OpenStreetMap** 52 paraderos, terminales y muelles reales de Puno (`data/osm-puno.js`, licencia ODbL), con actualización en vivo.
+6. **Prompt 6:** "usa apis para la geolocalizacion, el mapa ... tienes que tener en consideracion la ingenieria de software, y sistemas de informacion"
+
+   Resultado: se detectó que los tiles de CARTO devolvían "API KEY REQUIRED" y se cambiaron por OpenStreetMap y Esri (sin clave). APIs usadas: Geolocation API del navegador, Leaflet, OSM/Esri tiles, OSRM (trazos por calles), Overpass (datos abiertos), Open-Meteo (viento del lago).
+7. **Prompt 7:** "es para la region de puno ... tambien segmenta la provincia de puno"
+
+   Resultado: capa **Región** (`data/region.js`) con las 13 provincias de la región Puno y los 15 distritos de la provincia de Puno, unidas a Puno ciudad como grafo estrella de rutas interprovinciales (coordenadas referenciales).
 
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 

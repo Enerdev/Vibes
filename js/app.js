@@ -11,6 +11,7 @@ import { estadoLago, proximaSalida } from './lago.js';
 import { Grabadora, RutasComunidad, TIPOS as TIPOS_REG, CONFIRMACIONES_VALIDADA } from './registro.js';
 import { rutaOptima, lineaDeComunidad } from './grafo.js';
 import { osmLocal, osmActualizar, ESTILO_OSM } from './osm.js';
+import { PROVINCIAS, DISTRITOS_PUNO, REGION_LIMITES } from '../data/region.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -64,6 +65,7 @@ const capas = {
   lago: L.layerGroup().addTo(map),
   reportes: L.layerGroup().addTo(map),
   osm: L.layerGroup(),
+  region: L.layerGroup(),
 };
 const capaPlan = L.layerGroup().addTo(map);
 const capaYo = L.layerGroup().addTo(map);
@@ -818,6 +820,42 @@ function dibujarOSM(lista) {
       .addTo(capas.osm);
   }
 }
+
+// ---------------- Región Puno: provincias y distritos ----------------
+// Segmenta el territorio: la provincia de Puno (sus 15 distritos) y las otras 12
+// provincias de la región, unidas a Puno ciudad como un grafo estrella de rutas
+// interprovinciales. Al activar la capa, el mapa se abre a toda la región.
+function dibujarRegion() {
+  capas.region.clearLayers();
+  const centro = PROVINCIAS[0].pos;
+  for (const p of PROVINCIAS) {
+    if (p.id !== 'puno') {
+      L.polyline([centro, p.pos], { color: '#a78bfa', weight: 2, dashArray: '6 8', opacity: 0.8 }).addTo(capas.region);
+    }
+    L.circleMarker(p.pos, { radius: p.id === 'puno' ? 11 : 8, color: '#fff', weight: 2, fillColor: '#7c3aed', fillOpacity: 0.9 })
+      .bindTooltip(p.nombre, { permanent: true, direction: 'right', className: 'tt-region' })
+      .bindPopup(`<b>Provincia ${p.nombre}</b><br>Capital: ${p.capital}<br>
+        <small>${p.km ? `~${p.km} km de Puno por carretera` : 'Capital de la región'}<br>🚐 ${p.transporte}</small>`)
+      .addTo(capas.region);
+  }
+  for (const d of DISTRITOS_PUNO.slice(1)) {
+    L.circleMarker(d.pos, { radius: 5, color: '#c4b5fd', weight: 1, fillColor: '#c4b5fd', fillOpacity: 0.7 })
+      .bindTooltip(`Distrito ${d.nombre}${d.lago ? ' (isla, en lancha)' : ''} · prov. Puno`)
+      .addTo(capas.region);
+  }
+}
+dibujarRegion();
+$('[data-capa=region]').addEventListener('click', () => {
+  if (map.hasLayer(capas.region)) {
+    map.setMinZoom(7);
+    map.setMaxBounds(REGION_LIMITES);
+    map.flyToBounds(L.latLngBounds(PROVINCIAS.map((p) => p.pos)).pad(0.1), { duration: 0.8 });
+  } else {
+    map.setMaxBounds(CIUDAD.limites);
+    map.flyTo(CIUDAD.centro, CIUDAD.zoom, { duration: 0.8 });
+    map.once('moveend', () => map.setMinZoom(10));
+  }
+});
 
 // ---------------- Inicio ----------------
 function iniciar() {
