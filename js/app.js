@@ -12,6 +12,7 @@ import { Grabadora, RutasComunidad, TIPOS as TIPOS_REG, CONFIRMACIONES_VALIDADA 
 import { rutaOptima, lineaDeComunidad } from './grafo.js';
 import { osmLocal, osmActualizar, ESTILO_OSM } from './osm.js';
 import { PROVINCIAS, DISTRITOS_PUNO, REGION_LIMITES } from '../data/region.js';
+import { Cuentas, FILTROS } from './usuario.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -782,7 +783,7 @@ function renderComunidad() {
       <div class="ico-circ" style="background:${t.color}22">${t.emoji}</div>
       <div class="grow"><div class="titulo">${escapar(r.nombre)}</div>
         <div class="sub">${formatoDistancia(longitud(r.trazo))} · ${r.paradas.length} paraderos · S/ ${r.tarifa.toFixed(2)} ${estadoValidacion(r)}</div>
-        <div class="mini-acc"><button data-acc="confirmar">👍 Yo también la tomé</button><button data-acc="borrar">🗑 Borrar</button></div>
+        <div class="mini-acc"><button data-acc="guardar">⭐</button><button data-acc="confirmar">👍 Yo también la tomé</button><button data-acc="borrar">🗑 Borrar</button></div>
       </div></div>`;
   }).join('') : '<p class="muted">Aún no hay rutas grabadas en este celular. ¡Sé el primero!</p>';
   $$('#lista-comunidad [data-com]').forEach((card) => {
@@ -880,6 +881,106 @@ $('[data-capa=region]').addEventListener('click', () => {
   }
 });
 
+// ---------------- Cuenta de usuario, favoritos y filtros ----------------
+const cuentas = new Cuentas();
+
+/** Aplica los filtros del usuario: muestra u oculta cada tipo de transporte. */
+function aplicarFiltros() {
+  const f = cuentas.filtros;
+  for (const [id, def] of Object.entries(FILTROS)) {
+    for (const c of def.capas) {
+      f[id] ? capas[c].addTo(map) : map.removeLayer(capas[c]);
+      $(`#capas [data-capa="${c}"]`)?.classList.toggle('on', !!f[id]);
+    }
+  }
+}
+
+function renderCuenta() {
+  const u = cuentas.actual;
+  $('#btn-cuenta').textContent = u ? u.nombre[0].toUpperCase() : '👤';
+  $('#btn-cuenta').classList.toggle('con-sesion', !!u);
+  const cuerpo = $('#cuenta-cuerpo');
+  if (!u) {
+    cuerpo.innerHTML = `<p class="muted">Crea tu perfil para guardar tus lugares, tus rutas y qué transporte quieres ver.</p>
+      <input id="cu-nombre" maxlength="30" placeholder="Tu nombre de usuario" autocomplete="username" />
+      <input id="cu-pin" type="password" inputmode="numeric" maxlength="6" placeholder="PIN de 4 a 6 números" autocomplete="current-password" />
+      <p id="cu-error" class="cu-error" hidden></p>
+      <div class="modal-actions"><button id="cu-crear" class="ghost">Crear cuenta</button><button id="cu-entrar" class="primary">Entrar</button></div>
+      <p class="muted" style="font-size:12px">🔒 Tu PIN se guarda cifrado (SHA-256) solo en este celular.</p>`;
+    const accion = async (fn) => {
+      try {
+        await fn($('#cu-nombre').value, $('#cu-pin').value);
+        aplicarFiltros(); renderCuenta(); toast(`¡Hola, ${cuentas.actual.nombre}! 👋`);
+      } catch (e) { $('#cu-error').textContent = e.message; $('#cu-error').hidden = false; }
+    };
+    $('#cu-entrar').onclick = () => accion((n, p) => cuentas.entrar(n, p));
+    $('#cu-crear').onclick = () => accion((n, p) => cuentas.registrar(n, p));
+    return;
+  }
+  const filtros = Object.entries(FILTROS).map(([id, d]) =>
+    `<label class="cu-filtro"><input type="checkbox" data-filtro="${id}" ${u.filtros[id] ? 'checked' : ''}/> ${d.label}</label>`).join('');
+  const lugares = u.lugares.length ? u.lugares.map((l, i) =>
+    `<div class="cu-fav"><button data-ir-fav="${i}">📍 ${escapar(l.nombre)}</button><button data-quitar="lugares:${i}" title="Quitar">✕</button></div>`).join('')
+    : '<p class="muted">Aún no guardas lugares. En “¿Cómo llego?” toca ⭐ junto al destino.</p>';
+  const rutas = u.rutas.length ? u.rutas.map((r, i) =>
+    `<div class="cu-fav"><button data-ver-ruta="${i}">🚌 ${escapar(r.nombre)}</button><button data-quitar="rutas:${i}" title="Quitar">✕</button></div>`).join('')
+    : '<p class="muted">Aún no guardas rutas. Toca una línea en “Explorar” y luego ⭐ Guardar ruta.</p>';
+  cuerpo.innerHTML = `<p><b>Hola, ${escapar(u.nombre)}</b></p>
+    <h3>Qué transporte quiero ver</h3><div class="cu-filtros">${filtros}</div>
+    <h3>Mis lugares</h3>${lugares}
+    <h3>Mis rutas</h3>${rutas}
+    <div class="modal-actions"><button id="cu-salir" class="ghost">Cerrar sesión</button><button id="cu-cerrar" class="primary">Listo</button></div>`;
+  $$('#cuenta-cuerpo [data-filtro]').forEach((c) => {
+    c.onchange = () => { cuentas.setFiltro(c.dataset.filtro, c.checked); aplicarFiltros(); };
+  });
+  $$('#cuenta-cuerpo [data-quitar]').forEach((b) => {
+    b.onclick = () => { const [t, i] = b.dataset.quitar.split(':'); cuentas.quitar(t, +i); renderCuenta(); };
+  });
+  $$('#cuenta-cuerpo [data-ir-fav]').forEach((b) => {
+    b.onclick = () => {
+      const l = u.lugares[+b.dataset.irFav];
+      $('#modal-cuenta').hidden = true;
+      fijar('destino', { pos: l.pos, nombre: l.nombre });
+      abrirTab('ir');
+      asegurarOrigen();
+    };
+  });
+  $$('#cuenta-cuerpo [data-ver-ruta]').forEach((b) => {
+    b.onclick = () => {
+      const fav = u.rutas[+b.dataset.verRuta];
+      $('#modal-cuenta').hidden = true;
+      const r = st.rutas.find((x) => x.id === fav.id);
+      if (r) { abrirTab('explorar'); if (st.rutaSel !== r) seleccionarRuta(r); return; }
+      const c = comunidad.lista.find((x) => x.id === fav.id);
+      if (c) { abrirTab('registrar'); encuadrar(L.latLngBounds(c.trazo)); }
+    };
+  });
+  $('#cu-salir').onclick = () => { cuentas.salir(); aplicarFiltros(); renderCuenta(); toast('Sesión cerrada'); };
+  $('#cu-cerrar').onclick = () => { $('#modal-cuenta').hidden = true; };
+}
+
+$('#btn-cuenta').onclick = () => { renderCuenta(); $('#modal-cuenta').hidden = false; };
+$('#modal-cuenta').onclick = (e) => { if (e.target.id === 'modal-cuenta') $('#modal-cuenta').hidden = true; };
+
+$('#btn-guardar-destino').onclick = () => {
+  if (!cuentas.actual) { toast('Inicia sesión (👤) para guardar lugares'); return; }
+  if (!st.destino) { toast('Primero elige un destino'); return; }
+  toast(cuentas.guardarLugar(st.destino.nombre, st.destino.pos) ? `⭐ Guardado: ${st.destino.nombre}` : 'Ese lugar ya está guardado');
+};
+$('#btn-guardar-ruta').onclick = () => {
+  if (!cuentas.actual) { toast('Inicia sesión (👤) para guardar rutas'); return; }
+  if (!st.rutaSel) { toast('Toca primero una línea de la lista'); return; }
+  toast(cuentas.guardarRuta(st.rutaSel.id, st.rutaSel.nombre) ? `⭐ Ruta guardada: ${st.rutaSel.id}` : 'Esa ruta ya está guardada');
+};
+$('#lista-comunidad').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-acc="guardar"]');
+  if (!b) return;
+  e.stopPropagation();
+  if (!cuentas.actual) { toast('Inicia sesión (👤) para guardar rutas'); return; }
+  const r = comunidad.lista.find((x) => x.id === b.closest('[data-com]').dataset.com);
+  toast(cuentas.guardarRuta(r.id, r.nombre) ? '⭐ Ruta guardada' : 'Esa ruta ya está guardada');
+}, true);
+
 // ---------------- Inicio ----------------
 function iniciar() {
   st.rutas = cargarRed((rutas) => {
@@ -902,6 +1003,8 @@ function iniciar() {
   dibujarComunidad();
   renderComunidad();
   dibujarOSM(osmLocal());
+  aplicarFiltros();
+  renderCuenta();
   osmActualizar().then((l) => { if (l) dibujarOSM(l); });
   encuadrar(L.latLngBounds(st.rutas.flatMap((r) => r.trazo)), 15);
   setInterval(() => { renderCercanos(); dibujarReportes(); }, 20000);

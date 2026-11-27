@@ -340,3 +340,20 @@ body.claro .leaflet-control-attribution { background: rgba(255, 255, 255, .7) !i
   .cinta { left: 10px; right: 10px; bottom: auto; top: 118px; height: 34px; }
   body.panel-exp .cinta { display: none; }
 }
+
+/* ---------- Cuenta de usuario ---------- */
+#btn-cuenta { font-weight: 700; font-size: 18px; }
+#btn-cuenta.con-sesion { background: linear-gradient(135deg, var(--lago), var(--accent)); color: #fff; border: 0; }
+.cuenta-card { max-height: 85vh; overflow-y: auto; }
+.cuenta-card input:not([type=checkbox]) {
+  width: 100%; margin-top: 10px; padding: 11px 12px; border-radius: 12px; background: rgba(0, 0, 0, .25);
+  border: 1px solid var(--line); outline: none; box-sizing: border-box;
+}
+.cu-error { color: var(--accent); font-size: 13px; margin: 8px 0 0; }
+.cu-filtros { display: flex; flex-direction: column; gap: 8px; }
+.cu-filtro { display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: var(--card); cursor: pointer; }
+.cu-filtro input { accent-color: var(--accent); width: 18px; height: 18px; }
+.cu-fav { display: flex; gap: 6px; margin-bottom: 6px; }
+.cu-fav button:first-child { flex: 1; text-align: left; padding: 9px 12px; border-radius: 10px; background: var(--card); }
+.cu-fav button:last-child { padding: 0 12px; border-radius: 10px; background: var(--card); color: var(--muted); }
+.mini-guardar { float: right; font-size: 11px; text-transform: none; letter-spacing: 0; padding: 3px 8px; border-radius: 8px; background: var(--card); color: var(--gold); }

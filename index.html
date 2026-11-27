@@ -33,6 +33,7 @@
       <input id="buscar" type="search" placeholder="¿A dónde vas?" autocomplete="off" />
       <ul id="buscar-sugerencias" class="sugerencias" hidden></ul>
     </div>
+    <button id="btn-cuenta" class="icon-btn" title="Mi cuenta: favoritos y filtros">👤</button>
     <button id="btn-tema" class="icon-btn" title="Cambiar mapa: oscuro, satélite, claro">🌓</button>
   </header>
 
@@ -70,7 +71,7 @@
       <!-- EXPLORAR -->
       <section class="view on" data-view="explorar">
         <div class="demo-note">Datos de demostración · rutas y tarifas por validar en campo</div>
-        <h3>Rutas de combi</h3>
+        <h3>Rutas de combi <button id="btn-guardar-ruta" class="mini-guardar" title="Guardar la línea seleccionada">⭐ Guardar ruta</button></h3>
         <div id="lista-rutas" class="lista"></div>
         <h3>Paraderos cerca de ti</h3>
         <div id="lista-cercanos" class="lista"><p class="muted">Activa tu ubicación (◎) para ver paraderos cercanos.</p></div>
@@ -100,6 +101,7 @@
           <div class="od-actions">
             <button id="btn-mi-origen" class="ghost">◎ Usar mi ubicación</button>
             <button id="btn-invertir" class="ghost">⇅ Invertir</button>
+            <button id="btn-guardar-destino" class="ghost" title="Guardar el destino en mis lugares">⭐ Guardar destino</button>
             <label class="toggle"><input type="checkbox" id="chk-estudiante" /> Medio pasaje</label>
           </div>
         </div>
@@ -162,6 +164,14 @@
         <button id="btn-cancelar" class="ghost">Cancelar</button>
         <button id="btn-publicar" class="primary" disabled>Publicar</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Mi cuenta -->
+  <div id="modal-cuenta" class="modal" hidden>
+    <div class="modal-card cuenta-card">
+      <h3>👤 Mi cuenta</h3>
+      <div id="cuenta-cuerpo"></div>
     </div>
   </div>
 

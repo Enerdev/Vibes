@@ -70,6 +70,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: se verificó que no quedaban cambios sin subir y se registraron estos prompts.
 
+11. **Prompt 11:** "quiero que digamos haga un login, para que sea personalizado para cada usuario y se pueda guardar los lugares, o rutas que quiero, que hayan filtros para desactivar y activar la vision de transporte publico, transporte distrital, en moto, el barco asi"
+
+   Resultado: `js/usuario.js` con cuentas por dispositivo (PIN guardado con hash SHA-256 y sal, nunca en texto plano), lugares y rutas favoritas, y filtros por usuario (transporte público, distrital/interprovincial, mototaxi, taxi, lanchas) que se aplican al iniciar sesión. Probado: crear cuenta, PIN incorrecto rechazado, filtros y favoritos persistentes. Fase 2: sincronizar las cuentas con un backend.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo
