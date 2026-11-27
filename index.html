@@ -61,6 +61,7 @@
       <button class="tab" data-tab="ir">¿Cómo llego?</button>
       <button class="tab" data-tab="lago">Lago</button>
       <button class="tab" data-tab="reportes">Reportes <span id="badge-reportes" class="badge">0</span></button>
+      <button class="tab" data-tab="registrar">⭐ Registrar</button>
     </div>
 
     <div class="panel-body">
@@ -121,6 +122,30 @@
         <p class="muted">Reportes de la comunidad. Se ocultan solos después de 6 horas o cuando varios usuarios confirman que ya no están.</p>
         <button id="btn-reportar-2" class="primary full">＋ Reportar algo en la vía</button>
         <div id="lista-reportes" class="lista"></div>
+      </section>
+
+      <!-- REGISTRAR RUTA (función estrella) -->
+      <section class="view" data-view="registrar">
+        <p class="muted">¿Tu combi, mototaxi o lancha no está en el mapa? Súbete, toca <b>Iniciar</b> y grábala con el GPS de tu celular. Marca cada paradero. Si otros graban la misma ruta, se valida sola.</p>
+        <div class="reg-form">
+          <div class="reg-tipos" id="reg-tipos"></div>
+          <input id="reg-nombre" maxlength="60" placeholder="Nombre o número (ej. Línea 22 · Salcedo ⇄ Centro)" />
+          <input id="reg-tarifa" type="number" min="0" step="0.1" placeholder="Pasaje en S/ (ej. 1.00)" />
+          <label class="toggle"><input type="checkbox" id="reg-demo" /> Modo demo: trazar tocando el mapa (sin GPS)</label>
+        </div>
+        <div id="reg-estado" class="reg-estado" hidden></div>
+        <div class="reg-acciones">
+          <button id="reg-iniciar" class="primary full">● Iniciar grabación</button>
+          <button id="reg-paradero" class="ghost" hidden>🚏 Marcar paradero</button>
+          <button id="reg-terminar" class="primary" hidden>■ Terminar y guardar</button>
+          <button id="reg-cancelar" class="ghost" hidden>Cancelar</button>
+        </div>
+        <h3>Rutas de la comunidad</h3>
+        <div id="lista-comunidad" class="lista"></div>
+        <div class="od-actions">
+          <button id="reg-exportar" class="ghost">⬇ Exportar GeoJSON</button>
+          <label class="ghost reg-import">⬆ Importar GeoJSON<input id="reg-importar" type="file" accept=".geojson,.json" hidden /></label>
+        </div>
       </section>
     </div>
   </aside>

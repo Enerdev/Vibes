@@ -1,8 +1,8 @@
 // Service worker: la app abre aunque no haya señal (modo offline básico).
-const VERSION = 'vibes-v1';
+const VERSION = 'vibes-v2';
 const APP = [
   './', 'index.html', 'css/app.css', 'manifest.webmanifest', 'img/icon.svg',
-  'js/app.js', 'js/geo.js', 'js/red.js', 'js/envivo.js', 'js/planificador.js', 'js/reportes.js', 'js/lago.js',
+  'js/app.js', 'js/geo.js', 'js/red.js', 'js/envivo.js', 'js/planificador.js', 'js/reportes.js', 'js/lago.js', 'js/registro.js',
   'data/puno.js',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',

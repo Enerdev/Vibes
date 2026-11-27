@@ -2,12 +2,13 @@
 //  Vibes · Muévete por Puno — aplicación principal
 // ============================================================
 import { CIUDAD, LUGARES, PARADEROS_EXTRA, LAGO, INTERPROVINCIAL, TIPOS_REPORTE } from '../data/puno.js';
-import { distancia, formatoDistancia, formatoMinutos } from './geo.js';
+import { distancia, longitud, formatoDistancia, formatoMinutos } from './geo.js';
 import { cargarRed, paraderos as calcularParaderos, lugarPorId } from './red.js';
 import { Flota } from './envivo.js';
 import { planificar } from './planificador.js';
 import { Reportes, hace } from './reportes.js';
 import { estadoLago, proximaSalida } from './lago.js';
+import { Grabadora, RutasComunidad, TIPOS as TIPOS_REG, CONFIRMACIONES_VALIDADA } from './registro.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -606,6 +607,176 @@ function toast(msg, ms = 2800) {
 }
 function ocultarToast() { $('#toast').hidden = true; }
 
+// ---------------- Registrar ruta con GPS (función estrella) ----------------
+const capaComunidad = L.layerGroup().addTo(map);
+const capaGrabando = L.layerGroup().addTo(map);
+const comunidad = new RutasComunidad();
+let regTipo = 'combi';
+
+const grabadora = new Grabadora((evento, dato) => {
+  if (evento === 'error') {
+    toast(dato?.code === 1 ? 'Sin permiso de ubicación. Usa el modo demo para probar.' : 'No hay señal GPS todavía…');
+  }
+  if (evento === 'punto' && !grabadora.demo) map.panTo(dato, { animate: true });
+  dibujarGrabacion();
+});
+
+$('#reg-tipos').innerHTML = Object.entries(TIPOS_REG).map(([k, t]) =>
+  `<button data-regtipo="${k}" class="${k === regTipo ? 'sel' : ''}">${t.emoji} ${t.label}</button>`).join('');
+$$('#reg-tipos [data-regtipo]').forEach((b) => {
+  b.onclick = () => {
+    if (grabadora.activa) return;
+    regTipo = b.dataset.regtipo;
+    $$('#reg-tipos [data-regtipo]').forEach((x) => x.classList.toggle('sel', x === b));
+  };
+});
+
+function dibujarGrabacion() {
+  capaGrabando.clearLayers();
+  const g = grabadora;
+  const color = TIPOS_REG[g.tipo].color;
+  if (g.puntos.length > 1) {
+    L.polyline(g.puntos, { color, weight: 5, dashArray: g.tipo === 'lancha' ? '10 8' : null }).addTo(capaGrabando);
+  }
+  if (g.puntos.length) {
+    L.circleMarker(g.puntos[g.puntos.length - 1], { radius: 8, color: '#fff', fillColor: color, fillOpacity: 1, weight: 3 }).addTo(capaGrabando);
+  }
+  g.paradas.forEach((p) => L.marker(p, { icon: icono('<div class="mk-reg-parada"></div>', '', [14, 14]) }).addTo(capaGrabando));
+  const est = $('#reg-estado');
+  est.hidden = !g.activa;
+  if (g.activa) {
+    est.innerHTML = `<span class="rec"></span><b>Grabando ${TIPOS_REG[g.tipo].label.toLowerCase()}</b>${g.demo ? ' (demo: toca el mapa)' : ''}<br>
+      ${g.puntos.length} puntos · ${formatoDistancia(g.metros)} · ${g.paradas.length} paraderos
+      ${g.descartados ? `<br><small>${g.descartados} lecturas GPS imprecisas descartadas</small>` : ''}
+      ${!g.demo && g.tipo === 'lancha' ? '<br><small>⛵ En el lago el GPS tiene menos señal: mantén el celular a la vista del cielo.</small>' : ''}`;
+  }
+}
+
+function botonesGrabando(on) {
+  $('#reg-iniciar').hidden = on;
+  ['#reg-paradero', '#reg-terminar', '#reg-cancelar'].forEach((s) => { $(s).hidden = !on; });
+  ['#reg-nombre', '#reg-tarifa', '#reg-demo'].forEach((s) => { $(s).disabled = on; });
+}
+
+$('#reg-iniciar').onclick = () => {
+  if (!$('#reg-nombre').value.trim()) { toast('Ponle un nombre o número a la ruta'); $('#reg-nombre').focus(); return; }
+  const demo = $('#reg-demo').checked || !navigator.geolocation;
+  grabadora.iniciar({ demo, tipo: regTipo });
+  botonesGrabando(true);
+  if (demo) {
+    toast('Modo demo: toca el mapa siguiendo el recorrido', 4000);
+    if (esMovil()) setHoja('min');
+  } else toast('Grabando… súbete y viaja. Marca cada paradero.', 4000);
+};
+$('#reg-paradero').onclick = () => {
+  toast(grabadora.marcarParadero() ? '🚏 Paradero marcado' : 'Aún no hay ubicación para marcar');
+};
+$('#reg-cancelar').onclick = () => {
+  grabadora.reset();
+  botonesGrabando(false);
+  dibujarGrabacion();
+};
+$('#reg-terminar').onclick = () => {
+  const ruta = grabadora.terminar({ nombre: $('#reg-nombre').value.trim(), tarifa: Number($('#reg-tarifa').value) || 0 });
+  botonesGrabando(false);
+  if (!ruta) { toast('El recorrido es muy corto (mínimo 100 m). No se guardó.'); grabadora.reset(); dibujarGrabacion(); return; }
+  const { ruta: r, nueva } = comunidad.agregar(ruta);
+  grabadora.reset();
+  dibujarGrabacion();
+  dibujarComunidad();
+  renderComunidad();
+  if (esMovil()) setHoja('normal');
+  toast(nueva ? `✅ Ruta guardada: ${formatoDistancia(ruta.metros)}, ${ruta.paradas.length} paraderos`
+    : `👍 Ya existía una ruta igual: ahora tiene ${r.confirmaciones} confirmaciones`, 4000);
+};
+
+// En modo demo, cada toque al mapa es un punto del recorrido.
+map.on('click', (e) => {
+  if (st.pick || !grabadora.activa || !grabadora.demo) return;
+  grabadora.agregarPunto([e.latlng.lat, e.latlng.lng]);
+});
+
+function estadoValidacion(r) {
+  return r.confirmaciones >= CONFIRMACIONES_VALIDADA
+    ? `<span class="chip-val ok">comunidad ✓ ${r.confirmaciones}</span>`
+    : '<span class="chip-val">por validar</span>';
+}
+
+function dibujarComunidad() {
+  capaComunidad.clearLayers();
+  for (const r of comunidad.lista) {
+    const t = TIPOS_REG[r.tipo];
+    const validada = r.confirmaciones >= CONFIRMACIONES_VALIDADA;
+    L.polyline(r.trazo, {
+      color: t.color, weight: 5, opacity: 0.9,
+      dashArray: r.tipo === 'lancha' ? '10 8' : validada ? null : '2 8',
+    }).bindPopup(`<b>${t.emoji} ${escapar(r.nombre)}</b><br>${estadoValidacion(r)}<br>
+      <small>${formatoDistancia(longitud(r.trazo))} · S/ ${r.tarifa.toFixed(2)} · ~${r.velocidad} km/h</small>
+      <div style="margin-top:8px"><a href="#" data-confirmar="${r.id}">👍 Yo también la tomé</a></div>`)
+      .addTo(capaComunidad);
+    r.paradas.forEach((p) => L.marker(p, { icon: icono('<div class="mk-reg-parada"></div>', '', [14, 14]) })
+      .bindTooltip(`Paradero · ${escapar(r.nombre)}`).addTo(capaComunidad));
+  }
+}
+
+function renderComunidad() {
+  const l = comunidad.lista;
+  $('#lista-comunidad').innerHTML = l.length ? l.map((r) => {
+    const t = TIPOS_REG[r.tipo];
+    return `<div class="card" data-com="${r.id}">
+      <div class="ico-circ" style="background:${t.color}22">${t.emoji}</div>
+      <div class="grow"><div class="titulo">${escapar(r.nombre)}</div>
+        <div class="sub">${formatoDistancia(longitud(r.trazo))} · ${r.paradas.length} paraderos · S/ ${r.tarifa.toFixed(2)} ${estadoValidacion(r)}</div>
+        <div class="mini-acc"><button data-acc="confirmar">👍 Yo también la tomé</button><button data-acc="borrar">🗑 Borrar</button></div>
+      </div></div>`;
+  }).join('') : '<p class="muted">Aún no hay rutas grabadas en este celular. ¡Sé el primero!</p>';
+  $$('#lista-comunidad [data-com]').forEach((card) => {
+    card.onclick = (e) => {
+      const id = card.dataset.com;
+      const acc = e.target.closest('[data-acc]')?.dataset.acc;
+      if (acc === 'confirmar') { comunidad.confirmar(id); toast('¡Gracias por validar la ruta!'); }
+      else if (acc === 'borrar') { if (!confirm('¿Borrar esta ruta de tu celular?')) return; comunidad.borrar(id); }
+      else { const r = comunidad.lista.find((x) => x.id === id); if (r) encuadrar(L.latLngBounds(r.trazo)); return; }
+      dibujarComunidad();
+      renderComunidad();
+    };
+  });
+}
+
+map.on('popupopen', (e) => {
+  const a = e.popup.getElement()?.querySelector('[data-confirmar]');
+  if (!a) return;
+  a.onclick = (ev) => {
+    ev.preventDefault();
+    comunidad.confirmar(a.dataset.confirmar);
+    map.closePopup();
+    dibujarComunidad();
+    renderComunidad();
+    toast('¡Gracias por validar la ruta!');
+  };
+});
+
+$('#reg-exportar').onclick = () => {
+  if (!comunidad.lista.length) { toast('No hay rutas para exportar'); return; }
+  const blob = new Blob([JSON.stringify(comunidad.aGeoJSON(), null, 2)], { type: 'application/geo+json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vibes-rutas-comunidad.geojson';
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+$('#reg-importar').onchange = async (e) => {
+  const f = e.target.files[0];
+  if (!f) return;
+  try {
+    const n = comunidad.deGeoJSON(JSON.parse(await f.text()));
+    dibujarComunidad();
+    renderComunidad();
+    toast(`${n} rutas importadas`);
+  } catch { toast('El archivo no es un GeoJSON válido'); }
+  e.target.value = '';
+};
+
 // ---------------- Inicio ----------------
 function iniciar() {
   st.rutas = cargarRed((rutas) => {
@@ -625,6 +796,8 @@ function iniciar() {
   renderRutas();
   renderInterprovincial();
   renderLago();
+  dibujarComunidad();
+  renderComunidad();
   encuadrar(L.latLngBounds(st.rutas.flatMap((r) => r.trazo)), 15);
   setInterval(() => { renderCercanos(); dibujarReportes(); }, 20000);
   setInterval(renderLago, 10 * 60 * 1000);

@@ -253,3 +253,51 @@ body.claro .leaflet-control-attribution { background: rgba(255, 255, 255, .7) !i
   .toast { top: 112px; }
 }
 .full + .lista { margin-top: 14px; }
+
+/* ---------- Registrar ruta (función estrella) ---------- */
+.reg-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.reg-form input:not([type=checkbox]) {
+  padding: 11px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); outline: none;
+}
+.reg-form input:focus { border-color: var(--lago); }
+.reg-tipos { display: flex; gap: 6px; }
+.reg-tipos button { flex: 1; padding: 10px 4px; border-radius: 12px; background: var(--card); border: 1px solid transparent; font-size: 13px; }
+.reg-tipos button.sel { border-color: var(--lago); background: rgba(54, 182, 255, .12); }
+.reg-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.reg-acciones .primary, .reg-acciones .ghost { flex: 1; }
+.reg-estado {
+  margin-top: 12px; padding: 10px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.5;
+  background: rgba(255, 61, 127, .1); border: 1px solid rgba(255, 61, 127, .35);
+}
+.reg-estado .rec { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); margin-right: 6px; animation: rec 1s infinite; }
+@keyframes rec { 50% { opacity: .2; } }
+.reg-import { cursor: pointer; }
+.chip-val { font-size: 11px; padding: 2px 7px; border-radius: 8px; background: rgba(255, 197, 49, .15); color: var(--gold); }
+.chip-val.ok { background: rgba(34, 197, 94, .15); color: #22c55e; }
+.card .mini-acc { display: flex; gap: 6px; margin-top: 6px; }
+.card .mini-acc button { font-size: 12px; padding: 4px 8px; border-radius: 8px; background: rgba(255, 255, 255, .06); }
+.mk-reg-parada { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+
+/* ---------- Registrar ruta (función estrella) ---------- */
+.reg-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.reg-form input:not([type=checkbox]) {
+  padding: 11px 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); outline: none;
+}
+.reg-form input:focus { border-color: var(--lago); }
+.reg-tipos { display: flex; gap: 6px; }
+.reg-tipos button { flex: 1; padding: 10px 4px; border-radius: 12px; background: var(--card); border: 1px solid transparent; font-size: 13px; }
+.reg-tipos button.sel { border-color: var(--lago); background: rgba(54, 182, 255, .12); }
+.reg-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.reg-acciones .primary, .reg-acciones .ghost { flex: 1; }
+.reg-estado {
+  margin-top: 12px; padding: 10px 12px; border-radius: 12px; font-size: 13.5px; line-height: 1.5;
+  background: rgba(255, 61, 127, .1); border: 1px solid rgba(255, 61, 127, .35);
+}
+.reg-estado .rec { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--accent); margin-right: 6px; animation: rec 1s infinite; }
+@keyframes rec { 50% { opacity: .2; } }
+.reg-import { cursor: pointer; }
+.chip-val { font-size: 11px; padding: 2px 7px; border-radius: 8px; background: rgba(255, 197, 49, .15); color: var(--gold); }
+.chip-val.ok { background: rgba(34, 197, 94, .15); color: #22c55e; }
+.card .mini-acc { display: flex; gap: 6px; margin-top: 6px; }
+.card .mini-acc button { font-size: 12px; padding: 4px 8px; border-radius: 8px; background: rgba(255, 255, 255, .06); }
+.mk-reg-parada { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
