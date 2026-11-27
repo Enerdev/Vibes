@@ -95,6 +95,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: el informe suma la sección "Cumplimiento de los requisitos del reto". La IA avisó que faltaba **una base de datos** y, con la aprobación del equipo, la agregó: `database/schema.sql` (tablas `usuarios`, `rutas`, `reportes`), `api/index.php` (API REST en PHP 8 con PDO, consultas preparadas, PIN con bcrypt y token Bearer) y `js/api.js` (sincronización cada 30 s con respaldo local sin conexión). Probado en local con XAMPP: registro, login con PIN incorrecto rechazado, rutas, confirmaciones, reportes, votos y perfil guardados en MySQL; sin PHP la app sigue en modo local. Subido después de las 4:00 pm a pedido del equipo.
 
+17. **Prompt 17:** "vibes.lapreperu.com ayudame a subirlo a plesk te doy permiso con mi ordenador" (y luego "Sí, agrégala" para poner la URL)
+
+   Resultado: la IA operó el panel Plesk en el Chrome del equipo: importó las 3 tablas en la base MariaDB `lapreperu_vibe` y subió `api/config.php` (la contraseña la escribió el equipo, no la IA). Se verificó en producción: `api/index.php?r=salud` responde `{"ok":true,"db":true}` y la app muestra "Base de datos conectada". El sitio se despliega solo desde GitHub. URL agregada al README, al informe y a la guía de sustentación.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo

@@ -1,5 +1,7 @@
 # Vibes · Guía de sustentación
 
+**Proyecto publicado:** https://vibes.lapreperu.com · **Repositorio:** https://github.com/Enerdev/Vibes
+
 ## 1. ¿Qué problema resuelve?
 En la región Puno el transporte (combis, mototaxis, lanchas del lago, colectivos interprovinciales) funciona "de boca en boca": no hay mapa oficial ni datos abiertos de rutas, paraderos o tarifas. Vibes es **el primer mapa vivo del transporte de Puno, construido por la gente**: el pasajero consulta cómo llegar y, con el GPS de su celular, **registra las rutas que no existen en ningún mapa**.
 

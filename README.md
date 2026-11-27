@@ -3,6 +3,8 @@
 Mapa vivo del transporte de Puno: rutas de combis, paraderos, mototaxis, taxis,
 lanchas del Lago Titicaca y reportes de la comunidad en tiempo real.
 
+**🌐 Proyecto publicado:** https://vibes.lapreperu.com (HTTPS, con base de datos conectada).
+
 > ⚠️ **Datos de demostración.** Las rutas, coordenadas, horarios y tarifas de
 > `data/puno.js` son aproximados. El siguiente paso del equipo es levantarlos en campo.
 

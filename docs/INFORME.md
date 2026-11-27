@@ -13,7 +13,7 @@ La solución es una aplicación web progresiva (PWA) que funciona en celulares d
 | Dato | Valor |
 | --- | --- |
 | Repositorio | [github.com/Enerdev/Vibes](https://github.com/Enerdev/Vibes) |
-| Publicación | Servidor Plesk con HTTPS |
+| Proyecto publicado | [vibes.lapreperu.com](https://vibes.lapreperu.com) (Plesk, HTTPS, despliegue automático desde GitHub) |
 | Módulos de código | 12 archivos JavaScript + 3 de datos |
 | Pruebas automatizadas | 7 de 7 aprobadas (`npm test`) |
 | Datos abiertos | 52 paraderos, terminales y muelles de OpenStreetMap |
