@@ -16,6 +16,10 @@ lanchas del Lago Titicaca y reportes de la comunidad en tiempo real.
 | ⛵ **Lago** | Estado del lago con viento real (Open-Meteo) y próximas salidas a Uros, Taquile y Amantaní. |
 | ⚠️ **Reportes** | Accidentes, bloqueos/paros, obras, granizo/helada. La comunidad confirma "sigue ahí" o "ya no está"; caducan a las 6 h. |
 | 🚐 **Salir de Puno** | Salidas a Juliaca, aeropuerto, Ilave, Juli, Desaguadero, Lampa, Cusco y Arequipa. |
+| ⭐ **Registrar ruta** | Función estrella: graba con el GPS del celular rutas y paraderos de combis, mototaxis y lanchas que no están en ningún mapa. La comunidad las valida (2+ confirmaciones). Exporta/importa GeoJSON. |
+| 🕸️ **Grafo** | La red es un grafo; Dijkstra encuentra la ruta óptima y se adapta a los reportes activos. |
+| 🗺️ **Datos OSM** | 52 paraderos, terminales y muelles reales de OpenStreetMap (API Overpass). |
+| 🏔️ **Región** | 13 provincias de la región Puno y 15 distritos de la provincia de Puno. |
 | 📴 **Offline** | Es PWA: se instala en el celular y abre sin señal con las rutas y el mapa ya visto. |
 
 ## Cómo correrlo
@@ -62,6 +66,11 @@ Edita `data/puno.js`:
 
 3. Si cambias el recorrido de una ruta existente, borra el caché del navegador
    (`localStorage` → `vibes:trazos:v1`) para que se vuelva a trazar.
+
+## Documentación
+
+- [docs/INGENIERIA.md](docs/INGENIERIA.md): requerimientos, arquitectura, algoritmos, modelo de datos y pruebas.
+- [IA_Y_PROMPTS.md](IA_Y_PROMPTS.md): IA usada, skills e historial de prompts (requisito del concurso).
 
 ## Fase 2 (ideas del equipo)
 
