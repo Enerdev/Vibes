@@ -86,6 +86,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: pruebas unitarias automatizadas con el runner nativo de Node (`npm test`): 7 casos sobre Haversine, Douglas–Peucker, similitud de trazos y el grafo con Dijkstra (transbordo, pesos dinámicos y caso sin ruta). 7/7 aprobados.
 
+15. **Prompt 15:** "generame un informe con un lean canvas, que sea un modelo de negocio, genera un informe tecnico, y tambien todo lo necesario en ingenieria de software y sistemas de la informacion"
+
+   Resultado: `docs/INFORME.md` con resumen ejecutivo, Lean Canvas de 9 bloques, modelo de negocio con fuentes de ingreso y hoja de ruta, informe técnico (arquitectura, tecnologías, algoritmos, pruebas), ingeniería de software (actores, RF, RNF, caso de uso), sistemas de información (ciclo del dato, modelo de datos, seguridad) y plan a producción. Subido después de las 4:00 pm a pedido del equipo.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo

@@ -70,6 +70,7 @@ Edita `data/puno.js`:
 ## Documentación
 
 - [docs/INGENIERIA.md](docs/INGENIERIA.md): requerimientos, arquitectura, algoritmos, modelo de datos y pruebas.
+- [docs/INFORME.md](docs/INFORME.md): Lean Canvas, modelo de negocio, informe técnico, ingeniería de software y sistemas de información.
 - [docs/SUSTENTACION.md](docs/SUSTENTACION.md): respuestas para la sustentación.
 - [IA_Y_PROMPTS.md](IA_Y_PROMPTS.md): IA usada, skills e historial de prompts (requisito del concurso).
 
