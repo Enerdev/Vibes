@@ -10,6 +10,7 @@ import { Reportes, hace } from './reportes.js';
 import { estadoLago, proximaSalida } from './lago.js';
 import { Grabadora, RutasComunidad, TIPOS as TIPOS_REG, CONFIRMACIONES_VALIDADA } from './registro.js';
 import { rutaOptima, lineaDeComunidad } from './grafo.js';
+import { osmLocal, osmActualizar, ESTILO_OSM } from './osm.js';
 
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -60,6 +61,7 @@ const capas = {
   taxi: L.layerGroup(),
   lago: L.layerGroup().addTo(map),
   reportes: L.layerGroup().addTo(map),
+  osm: L.layerGroup(),
 };
 const capaPlan = L.layerGroup().addTo(map);
 const capaYo = L.layerGroup().addTo(map);
@@ -803,6 +805,18 @@ $('#reg-importar').onchange = async (e) => {
   e.target.value = '';
 };
 
+// ---------------- Datos abiertos de OpenStreetMap ----------------
+function dibujarOSM(lista) {
+  capas.osm.clearLayers();
+  for (const e of lista) {
+    const t = ESTILO_OSM[e.tipo];
+    L.marker(e.pos, { icon: icono(`<div class="mk-osm">${t.emoji}</div>`, '', [24, 24]) })
+      .bindPopup(`<b>${t.emoji} ${e.nombre ? escapar(e.nombre) : t.label}</b><br><small>${t.label} · dato abierto
+        <a href="https://www.openstreetmap.org/${{ n: 'node', w: 'way', r: 'relation' }[e.id[0]]}/${e.id.slice(1)}" target="_blank" rel="noopener">ver en OSM</a></small>`)
+      .addTo(capas.osm);
+  }
+}
+
 // ---------------- Inicio ----------------
 function iniciar() {
   st.rutas = cargarRed((rutas) => {
@@ -824,6 +838,8 @@ function iniciar() {
   renderLago();
   dibujarComunidad();
   renderComunidad();
+  dibujarOSM(osmLocal());
+  osmActualizar().then((l) => { if (l) dibujarOSM(l); });
   encuadrar(L.latLngBounds(st.rutas.flatMap((r) => r.trazo)), 15);
   setInterval(() => { renderCercanos(); dibujarReportes(); }, 20000);
   setInterval(renderLago, 10 * 60 * 1000);

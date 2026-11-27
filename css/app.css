@@ -301,3 +301,4 @@ body.claro .leaflet-control-attribution { background: rgba(255, 255, 255, .7) !i
 .card .mini-acc { display: flex; gap: 6px; margin-top: 6px; }
 .card .mini-acc button { font-size: 12px; padding: 4px 8px; border-radius: 8px; background: rgba(255, 255, 255, .06); }
 .mk-reg-parada { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--accent); }
+.mk-osm { width: 24px; height: 24px; display: grid; place-items: center; font-size: 13px; border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 1px 4px rgba(0, 0, 0, .4); }
