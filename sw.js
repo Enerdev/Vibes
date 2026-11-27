@@ -1,5 +1,5 @@
 // Service worker: la app abre aunque no haya señal (modo offline básico).
-const VERSION = 'vibes-v4';
+const VERSION = 'vibes-v5';
 const APP = [
   './', 'index.html', 'css/app.css', 'manifest.webmanifest', 'img/icon.svg',
   'js/app.js', 'js/geo.js', 'js/red.js', 'js/envivo.js', 'js/planificador.js', 'js/reportes.js', 'js/lago.js', 'js/registro.js', 'js/grafo.js', 'js/osm.js',
@@ -23,7 +23,7 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
   // Teselas del mapa: guardar las que ya se vieron para usarlas sin señal
-  if (url.hostname.endsWith('basemaps.cartocdn.com')) {
+  if (url.hostname === 'server.arcgisonline.com' || url.hostname === 'tile.openstreetmap.org') {
     e.respondWith(caches.open('vibes-tiles').then(async (c) => {
       const hit = await c.match(e.request);
       if (hit) return hit;

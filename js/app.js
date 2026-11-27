@@ -36,18 +36,20 @@ const st = {
 const map = L.map('map', { zoomControl: false, minZoom: 10, maxBounds: CIUDAD.limites, maxBoundsViscosity: 0.8 })
   .setView(CIUDAD.centro, CIUDAD.zoom);
 
+// Mapas base sin clave de API (los de CARTO devolvían "API KEY REQUIRED").
 const TILES = {
-  oscuro: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-  claro: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  oscuro: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+  claro: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 };
-const ATRIB = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>';
+const ATRIB = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Tiles &copy; Esri';
 let tema = 'oscuro';
 try { tema = localStorage.getItem('vibes:tema') || 'oscuro'; } catch { /* */ }
-const base = L.tileLayer(TILES[tema], { attribution: ATRIB, maxZoom: 19, subdomains: 'abcd' }).addTo(map);
+const base = L.tileLayer(TILES[tema], { attribution: ATRIB, maxZoom: 19, maxNativeZoom: tema === 'oscuro' ? 16 : 19 }).addTo(map);
 document.body.classList.toggle('claro', tema === 'claro');
 
 $('#btn-tema').onclick = () => {
   tema = tema === 'oscuro' ? 'claro' : 'oscuro';
+  base.options.maxNativeZoom = tema === 'oscuro' ? 16 : 19;
   base.setUrl(TILES[tema]);
   document.body.classList.toggle('claro', tema === 'claro');
   try { localStorage.setItem('vibes:tema', tema); } catch { /* */ }
