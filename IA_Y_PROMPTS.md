@@ -63,6 +63,13 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: la IA abrió la referencia en el navegador y tomó sus patrones de UX de monitoreo en tiempo real, adaptados a Vibes: **vista satélite** del lago y la ciudad (Esri World Imagery, el botón 🌓 rota oscuro → satélite → claro), **anillos de radar** que pulsan en cada reporte y una **cinta "EN VIVO"** con los eventos activos (al tocar un evento, el mapa vuela a él). Probado en escritorio y móvil.
 
+9. **Prompt 9:** "quiero ver como esta"
+
+   Resultado: la IA abrió la app en el navegador integrado y mostró la vista satélite con rutas, reportes con radar y la cinta EN VIVO.
+10. **Prompt 10:** "solo quiero guardar todos los cambios en el repositorio tambien"
+
+   Resultado: se verificó que no quedaban cambios sin subir y se registraron estos prompts.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo
