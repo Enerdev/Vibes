@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Vibes · Muévete por Puno</title>
+  <meta name="description" content="Rutas de combis, paraderos, lanchas del lago y reportes en tiempo real en Puno." />
+  <meta name="theme-color" content="#0b1020" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="img/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="img/icon.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <div id="map" aria-label="Mapa de Puno"></div>
+
+  <!-- Barra superior -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="img/icon.svg" alt="" width="34" height="34" />
+      <div>
+        <strong>Vibes</strong>
+        <small>Muévete por Puno</small>
+      </div>
+    </div>
+    <div class="search">
+      <span class="search-ico">🔎</span>
+      <input id="buscar" type="search" placeholder="¿A dónde vas?" autocomplete="off" />
+      <ul id="buscar-sugerencias" class="sugerencias" hidden></ul>
+    </div>
+    <button id="btn-tema" class="icon-btn" title="Cambiar mapa claro/oscuro">🌓</button>
+  </header>
+
+  <!-- Capas -->
+  <nav class="chips" id="capas" aria-label="Capas del mapa">
+    <button class="chip on" data-capa="rutas">🚌 Combis</button>
+    <button class="chip on" data-capa="envivo">📡 En vivo</button>
+    <button class="chip on" data-capa="paraderos">🚏 Paraderos</button>
+    <button class="chip" data-capa="mototaxi">🛺 Mototaxis</button>
+    <button class="chip" data-capa="taxi">🚕 Taxis</button>
+    <button class="chip on" data-capa="lago">⛵ Lago</button>
+    <button class="chip on" data-capa="reportes">⚠️ Reportes</button>
+  </nav>
+
+  <!-- Botones flotantes del mapa -->
+  <div class="fabs">
+    <button id="btn-ubicacion" class="fab" title="Mi ubicación">◎</button>
+    <button id="btn-reportar" class="fab fab-accent" title="Reportar incidente">＋</button>
+  </div>
+
+  <!-- Panel / hoja inferior -->
+  <aside id="panel" class="panel">
+    <div class="handle" id="handle"><span></span></div>
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-tab="explorar">Explorar</button>
+      <button class="tab" data-tab="ir">¿Cómo llego?</button>
+      <button class="tab" data-tab="lago">Lago</button>
+      <button class="tab" data-tab="reportes">Reportes <span id="badge-reportes" class="badge">0</span></button>
+    </div>
+
+    <div class="panel-body">
+      <!-- EXPLORAR -->
+      <section class="view on" data-view="explorar">
+        <div class="demo-note">Datos de demostración · rutas y tarifas por validar en campo</div>
+        <h3>Rutas de combi</h3>
+        <div id="lista-rutas" class="lista"></div>
+        <h3>Paraderos cerca de ti</h3>
+        <div id="lista-cercanos" class="lista"><p class="muted">Activa tu ubicación (◎) para ver paraderos cercanos.</p></div>
+        <h3>Salir de Puno</h3>
+        <div id="lista-interprov" class="lista"></div>
+      </section>
+
+      <!-- CÓMO LLEGO -->
+      <section class="view" data-view="ir">
+        <div class="od">
+          <div class="od-row">
+            <span class="dot dot-a"></span>
+            <div class="od-field">
+              <input id="origen" placeholder="Origen" autocomplete="off" />
+              <ul class="sugerencias" hidden></ul>
+            </div>
+            <button class="mini" data-pick="origen" title="Elegir en el mapa">📍</button>
+          </div>
+          <div class="od-row">
+            <span class="dot dot-b"></span>
+            <div class="od-field">
+              <input id="destino" placeholder="Destino" autocomplete="off" />
+              <ul class="sugerencias" hidden></ul>
+            </div>
+            <button class="mini" data-pick="destino" title="Elegir en el mapa">📍</button>
+          </div>
+          <div class="od-actions">
+            <button id="btn-mi-origen" class="ghost">◎ Usar mi ubicación</button>
+            <button id="btn-invertir" class="ghost">⇅ Invertir</button>
+            <label class="toggle"><input type="checkbox" id="chk-estudiante" /> Medio pasaje</label>
+          </div>
+        </div>
+        <div id="resultados" class="lista">
+          <p class="muted">Elige origen y destino: escribe un lugar o toca 📍 y luego el mapa.</p>
+        </div>
+      </section>
+
+      <!-- LAGO -->
+      <section class="view" data-view="lago">
+        <div id="estado-lago" class="estado-lago cargando">
+          <div class="estado-ico">🌊</div>
+          <div><strong>Consultando el lago…</strong><small>Viento y clima en tiempo real</small></div>
+        </div>
+        <h3>Salidas desde el puerto de Puno</h3>
+        <div id="lista-lago" class="lista"></div>
+        <button id="btn-ir-puerto" class="primary full">🧭 ¿Cómo llego al puerto?</button>
+      </section>
+
+      <!-- REPORTES -->
+      <section class="view" data-view="reportes">
+        <p class="muted">Reportes de la comunidad. Se ocultan solos después de 6 horas o cuando varios usuarios confirman que ya no están.</p>
+        <button id="btn-reportar-2" class="primary full">＋ Reportar algo en la vía</button>
+        <div id="lista-reportes" class="lista"></div>
+      </section>
+    </div>
+  </aside>
+
+  <!-- Modal de reporte -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card">
+      <h3>¿Qué está pasando?</h3>
+      <div id="tipos-reporte" class="tipos"></div>
+      <textarea id="texto-reporte" rows="2" maxlength="140" placeholder="Detalle opcional (ej. carril cerrado frente al mercado)"></textarea>
+      <div class="modal-actions">
+        <button id="btn-cancelar" class="ghost">Cancelar</button>
+        <button id="btn-publicar" class="primary" disabled>Publicar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
