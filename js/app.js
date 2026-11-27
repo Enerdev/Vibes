@@ -41,16 +41,21 @@ const map = L.map('map', { zoomControl: false, minZoom: 10, maxBounds: CIUDAD.li
 const TILES = {
   oscuro: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   claro: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+  satelite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
 };
+const ORDEN_TEMAS = ['oscuro', 'satelite', 'claro'];
+const zoomNativo = (t) => (t === 'oscuro' ? 16 : t === 'satelite' ? 18 : 19);
 const ATRIB = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Tiles &copy; Esri';
 let tema = 'oscuro';
 try { tema = localStorage.getItem('vibes:tema') || 'oscuro'; } catch { /* */ }
-const base = L.tileLayer(TILES[tema], { attribution: ATRIB, maxZoom: 19, maxNativeZoom: tema === 'oscuro' ? 16 : 19 }).addTo(map);
+if (!TILES[tema]) tema = 'oscuro';
+const base = L.tileLayer(TILES[tema], { attribution: ATRIB, maxZoom: 19, maxNativeZoom: zoomNativo(tema) }).addTo(map);
 document.body.classList.toggle('claro', tema === 'claro');
 
 $('#btn-tema').onclick = () => {
-  tema = tema === 'oscuro' ? 'claro' : 'oscuro';
-  base.options.maxNativeZoom = tema === 'oscuro' ? 16 : 19;
+  tema = ORDEN_TEMAS[(ORDEN_TEMAS.indexOf(tema) + 1) % ORDEN_TEMAS.length];
+  base.options.maxNativeZoom = zoomNativo(tema);
+  toast({ oscuro: 'Mapa oscuro', satelite: 'Vista satélite', claro: 'Mapa claro' }[tema], 1500);
   base.setUrl(TILES[tema]);
   document.body.classList.toggle('claro', tema === 'claro');
   try { localStorage.setItem('vibes:tema', tema); } catch { /* */ }
@@ -493,10 +498,11 @@ function dibujarReportes() {
   capas.reportes.clearLayers();
   const activos = st.reportes.activos();
   $('#badge-reportes').textContent = activos.length;
+  renderCinta(activos);
   for (const r of activos) {
     const t = TIPOS_REPORTE[r.tipo] || TIPOS_REPORTE.otro;
     L.marker(r.pos, {
-      icon: icono(`<div class="mk-emoji mk-reporte" style="--c:${t.color}99;border-color:${t.color}">${t.emoji}</div>`),
+      icon: icono(`<div class="radar" style="--c:${t.color}"></div><div class="mk-emoji mk-reporte" style="--c:${t.color}99;border-color:${t.color}">${t.emoji}</div>`),
       zIndexOffset: 700,
     }).bindPopup(() => `<b>${t.emoji} ${t.label}</b>${r.texto ? `<br>${escapar(r.texto)}` : ''}<br>
       <small>${hace(r.creado)} · ${r.sigue} confirman</small>`).addTo(capas.reportes);
@@ -527,6 +533,23 @@ function dibujarReportes() {
     };
   });
 }
+
+/** Cinta "EN VIVO" inferior: reportes activos y datos de la red, uno tras otro. */
+function renderCinta(activos) {
+  const items = activos.map((r) => {
+    const t = TIPOS_REPORTE[r.tipo] || TIPOS_REPORTE.otro;
+    return `<span class="ci" data-cpos="${r.pos.join(',')}"><b>${t.emoji} ${t.label}</b> ${r.texto ? escapar(r.texto) : ''} <i>${hace(r.creado)}</i></span>`;
+  });
+  items.push(`<span class="ci"><b>📡 Red</b> ${st.rutas.length} líneas de combi · ${st.paraderos.length} paraderos</span>`);
+  if (typeof comunidad !== 'undefined') items.push(`<span class="ci"><b>⭐ Comunidad</b> ${comunidad.lista.length} rutas grabadas por pasajeros</span>`);
+  const pista = items.join('<span class="sep">•</span>');
+  $('#cinta-pista').innerHTML = pista + '<span class="sep">•</span>' + pista;  // duplicado = desplazamiento continuo
+  $('#cinta-n').textContent = activos.length;
+}
+$('#cinta').onclick = (e) => {
+  const ci = e.target.closest('[data-cpos]');
+  if (ci) map.flyTo(ci.dataset.cpos.split(',').map(Number), 17, { duration: 0.8 });
+};
 
 function iniciarReporte() {
   abrirTab('reportes');

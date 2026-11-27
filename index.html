@@ -33,7 +33,7 @@
       <input id="buscar" type="search" placeholder="¿A dónde vas?" autocomplete="off" />
       <ul id="buscar-sugerencias" class="sugerencias" hidden></ul>
     </div>
-    <button id="btn-tema" class="icon-btn" title="Cambiar mapa claro/oscuro">🌓</button>
+    <button id="btn-tema" class="icon-btn" title="Cambiar mapa: oscuro, satélite, claro">🌓</button>
   </header>
 
   <!-- Capas -->
@@ -163,6 +163,12 @@
         <button id="btn-publicar" class="primary" disabled>Publicar</button>
       </div>
     </div>
+  </div>
+
+  <!-- Cinta de eventos en vivo -->
+  <div id="cinta" class="cinta" aria-live="polite">
+    <span class="cinta-live"><span class="punto"></span>EN VIVO <b id="cinta-n">0</b></span>
+    <div class="cinta-ventana"><div id="cinta-pista" class="cinta-pista"></div></div>
   </div>
 
   <div id="toast" class="toast" hidden></div>

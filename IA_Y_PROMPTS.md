@@ -59,6 +59,10 @@ Archivo requerido por las bases del concurso (Temática: Transporte en la Regió
 
    Resultado: capa **Región** (`data/region.js`) con las 13 provincias de la región Puno y los 15 distritos de la provincia de Puno, unidas a Puno ciudad como grafo estrella de rutas interprovinciales (coordenadas referenciales).
 
+8. **Prompt 8:** "https://www.conflictradar360.com/ es una referencia del mapa, pero tu puedes sacar interfaces plantillas de pinterest GUI Y UX"
+
+   Resultado: la IA abrió la referencia en el navegador y tomó sus patrones de UX de monitoreo en tiempo real, adaptados a Vibes: **vista satélite** del lago y la ciudad (Esri World Imagery, el botón 🌓 rota oscuro → satélite → claro), **anillos de radar** que pulsan en cada reporte y una **cinta "EN VIVO"** con los eventos activos (al tocar un evento, el mapa vuela a él). Probado en escritorio y móvil.
+
 <!-- Agreguen aquí los siguientes prompts que usen, con su resultado. -->
 
 ## 4. Qué hizo la IA y qué hizo el equipo

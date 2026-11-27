@@ -304,3 +304,39 @@ body.claro .leaflet-control-attribution { background: rgba(255, 255, 255, .7) !i
 .mk-osm { width: 24px; height: 24px; display: grid; place-items: center; font-size: 13px; border-radius: 50%; background: rgba(255, 255, 255, .92); box-shadow: 0 1px 4px rgba(0, 0, 0, .4); }
 .tt-region { background: rgba(124, 58, 237, .9); color: #fff; border: 0; font-weight: 600; font-size: 11px; }
 .tt-region::before { display: none; }
+
+/* ---------- Estilo radar (referencia: mapas de monitoreo en tiempo real) ---------- */
+.radar {
+  position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px;
+  border-radius: 50%; pointer-events: none;
+}
+.radar::before, .radar::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid var(--c); animation: radar 2.4s ease-out infinite;
+}
+.radar::after { animation-delay: 1.2s; }
+@keyframes radar { from { transform: scale(1); opacity: .9; } to { transform: scale(4.2); opacity: 0; } }
+
+.cinta {
+  position: fixed; z-index: 950; left: calc(var(--panel-w) + 28px); right: 90px; bottom: 16px; height: 40px;
+  display: flex; align-items: center; gap: 10px; padding: 0 6px 0 4px; cursor: default;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  backdrop-filter: blur(14px); box-shadow: var(--shadow); overflow: hidden;
+}
+.cinta-live {
+  flex: none; display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 10px;
+  background: rgba(255, 61, 127, .15); color: var(--accent); font-size: 12px; font-weight: 700; letter-spacing: 1px;
+}
+.cinta-live b { background: var(--accent); color: #fff; border-radius: 8px; padding: 0 6px; font-size: 11px; }
+.cinta-live .punto { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: rec 1s infinite; }
+.cinta-ventana { flex: 1; overflow: hidden; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.cinta-pista { display: inline-flex; white-space: nowrap; gap: 14px; font-size: 13px; animation: cinta 45s linear infinite; }
+.cinta:hover .cinta-pista { animation-play-state: paused; }
+.cinta-pista .ci[data-cpos] { cursor: pointer; }
+.cinta-pista i { color: var(--muted); font-style: normal; font-size: 12px; }
+.cinta-pista .sep { color: var(--muted); }
+@keyframes cinta { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@media (max-width: 820px) {
+  .cinta { left: 10px; right: 10px; bottom: auto; top: 118px; height: 34px; }
+  body.panel-exp .cinta { display: none; }
+}
